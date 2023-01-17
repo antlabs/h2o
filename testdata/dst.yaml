@@ -1,0 +1,120 @@
+---
+package: "users"
+muilt:
+- handler: New #函数名, 名字是New认识是构造函数
+  reqName: #请求参数, 为空那形参就为空
+  respName: Users #返回的结构体名
+  respType:       #返回的结构体类型
+    host: www.xxx.com
+    org_name: 
+    app_name:
+
+# 1.开放注册单个用户
+- handler: Users.CreateUsers 
+  reqName: CreateUsersReq
+  respName: CreateUsersResp
+  url: https://{host}/{org_name}/{app_name}/users
+  req:
+    method: POST
+    header:
+    - 'Content-Type: application/json'
+    - 'Accept: application/json'
+    body:
+      username: user1
+      password: '123'
+      nickname: testuser
+  resp:
+    body:
+      action: post
+      application: 8be024f0-e978-XXXX-XXXX-5d598d5f8402
+      path: "/users"
+      uri: https://XXXX.com/XXXX-demo/XXXX/users
+      entities:
+      - uuid: 0ffe2d80-XXXX-XXXX-8d66-279e3e1c214b
+        type: user
+        created: 1542795196504
+        modified: 1542795196504
+        username: user1
+        activated: true
+        nickname: testuser
+      timestamp: 1542795196515
+      duration: 0
+      organization: XXXX-demo
+      applicationName: XXXX
+
+# 2.授权注册单个用户
+- handler: Users.CreateUsers2
+  url: https://{host}/{org_name}/{app_name}/users
+  reqName: CreateUsers2Req
+  respName: CreateUsers2Resp
+  req:
+    method: POST
+    header:
+    - 'Content-Type: application/json'
+    - 'Accept: application/json'
+    - 'Authorization:'
+    body:
+      - username: user1
+        password: '123'
+        nickname: testuser
+  resp:
+    body:
+      action: post
+      application: 8be024f0-XXXX-XXXX-b697-5d598d5f8402
+      path: "/users"
+      uri: https://XXXX/XXXX/XXXX/users
+      entities:
+      - uuid: 0ffe2d80-XXXX-XXXX-8d66-279e3e1c214b
+        type: user
+        created: 1542795196504
+        modified: 1542795196504
+        username: user1
+        activated: true
+        nickname: testuser
+      timestamp: 1542795196515
+      duration: 0
+      organization: XXXX
+      applicationName: XXXX
+# 3.批量注册用户
+- handler: Users.CreateUsers3
+  url: https://{host}/{org_name}/{app_name}/users
+  reqName: CreateUsers3Req
+  respName: CreateUsers3Resp
+  req:
+    method: POST
+    header:
+    - 'Content-Type: application/json'
+    - 'Authorization:'
+    body:
+      - username: user1
+        password: '123'
+        nickname: testuser1
+      - username: user2
+        password: '456'
+        nickname: testuser2
+  resp:
+    body:
+      action: post
+      application: 22bcffa0-XXXX-XXXX-9df8-516f6df68c6d
+      path: "/users"
+      uri: https://XXXX/XXXX/XXXX/users
+      entities:
+      - uuid: 278b5e60-XXXX-XXXX-8f9b-d5d83ebec806
+        type: user
+        created: 1541587920710
+        modified: 1541587920710
+        username: user1
+        activated: true
+        nickname: testuser1
+      - uuid: 278bac80-XXXX-XXXX-b192-73e4cd5078a5
+        type: user
+        created: 1541587920712
+        modified: 1541587920712
+        username: user2
+        activated: true
+        nickname: testuser2
+      timestamp: 1541587920714
+      data: []
+      duration: 0
+      organization: XXXX
+      applicationName: XXXX
