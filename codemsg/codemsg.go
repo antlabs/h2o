@@ -88,7 +88,7 @@ func (g *Generator) generateCodeMsg(c *CodeMsg, typeName string) {
 
 	tmpl := CodeMsgTmpl{AllVariable: values}
 	deepcopy.Copy(&tmpl, c).Do()
-	tmpl.Args = os.Args[2:]
+	tmpl.Args = strings.Join(os.Args[2:], " ")
 	tmpl.PkgName = g.pkg.name
 
 	//tmpl.Gen(os.Stdout)

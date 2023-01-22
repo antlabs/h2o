@@ -46,11 +46,11 @@ const codemsgTmpl = `
 type CodeMsgTmpl struct {
 	PkgName      string // 包名
 	TypeName     string
-	CodeMsgName  string   // CodeMsg{Code int, Message string} 结构体的名字
-	CodeName     string   // 修改Code字段的名字
-	MessageName  string   // 修改Message 字段的名字
-	Args         []string // os.Args[2:]
-	OriginalName string   //
+	CodeMsgName  string // CodeMsg{Code int, Message string} 结构体的名字
+	CodeName     string // 修改Code字段的名字
+	MessageName  string // 修改Message 字段的名字
+	Args         string // os.Args[2:]
+	OriginalName string //
 	AllVariable  []Value
 }
 
