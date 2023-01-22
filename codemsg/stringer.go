@@ -267,7 +267,7 @@ func (g *Generator) generate(typeName string) {
 	g.Printf("\t// Re-run the h2o codemsg command to generate them again.\n")
 	g.Printf("\tvar x [1]struct{}\n")
 	for _, v := range values {
-		g.Printf("\t_ = x[%s - %s]\n", v.originalName, v.str)
+		g.Printf("\t_ = x[%s - %s]\n", v.OriginalName, v.str)
 	}
 	g.Printf("}\n")
 	runs := splitIntoRuns(values)
@@ -340,8 +340,8 @@ func (g *Generator) format() []byte {
 
 // Value represents a declared constant.
 type Value struct {
-	originalName string // The name of the constant.
-	name         string // The name with trimmed prefix.
+	OriginalName string // The name of the constant.
+	Name         string // The name with trimmed prefix.
 	// The value is stored as a bit pattern alone. The boolean tells us
 	// whether to interpret it as an int64 or a uint64; the only place
 	// this matters is when sorting.
@@ -450,15 +450,15 @@ func (f *File) genDecl(node ast.Node) bool {
 				u64 = uint64(i64)
 			}
 			v := Value{
-				originalName: name.Name,
+				OriginalName: name.Name,
 				value:        u64,
 				signed:       info&types.IsUnsigned == 0,
 				str:          value.String(),
 			}
 			if c := vspec.Comment; f.lineComment && c != nil && len(c.List) == 1 {
-				v.name = strings.TrimSpace(c.Text())
+				v.Name = strings.TrimSpace(c.Text())
 			} else {
-				v.name = strings.TrimPrefix(v.originalName, f.trimPrefix)
+				v.Name = strings.TrimPrefix(v.OriginalName, f.trimPrefix)
 			}
 			f.values = append(f.values, v)
 		}
@@ -521,7 +521,7 @@ func (g *Generator) createIndexAndNameDecl(run []Value, typeName string, suffix 
 	b := new(bytes.Buffer)
 	indexes := make([]int, len(run))
 	for i := range run {
-		b.WriteString(run[i].name)
+		b.WriteString(run[i].Name)
 		indexes[i] = b.Len()
 	}
 	nameConst := fmt.Sprintf("_%s_name%s = %q", typeName, suffix, b.String())
@@ -543,7 +543,7 @@ func (g *Generator) declareNameVars(runs [][]Value, typeName string, suffix stri
 	g.Printf("const _%s_name%s = \"", typeName, suffix)
 	for _, run := range runs {
 		for i := range run {
-			g.Printf("%s", run[i].name)
+			g.Printf("%s", run[i].Name)
 		}
 	}
 	g.Printf("\"\n")
@@ -635,8 +635,8 @@ func (g *Generator) buildMap(runs [][]Value, typeName string) {
 	n := 0
 	for _, values := range runs {
 		for _, value := range values {
-			g.Printf("\t%s: _%s_name[%d:%d],\n", &value, typeName, n, n+len(value.name))
-			n += len(value.name)
+			g.Printf("\t%s: _%s_name[%d:%d],\n", &value, typeName, n, n+len(value.Name))
+			n += len(value.Name)
 		}
 	}
 	g.Printf("}\n\n")
