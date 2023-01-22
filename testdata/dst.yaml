@@ -6,8 +6,8 @@ muilt:
   respName: Users #返回的结构体名
   respType:       #返回的结构体类型
     host: www.xxx.com
-    org_name: 
-    app_name:
+    org_name:  ""
+    app_name: ""
 
 # 1.开放注册单个用户
 - handler: Users.CreateUsers 
