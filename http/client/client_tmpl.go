@@ -1,8 +1,8 @@
-package httpcli
+package client
 
 import (
-	"html/template"
 	"io"
+	"text/template"
 )
 
 // 构造函数
@@ -25,12 +25,13 @@ func New() *{{.StructName}} {
 // 函数
   {{- $ReceiverName := .ReceiverName}}
   {{- $StructName := .StructName}}
+  {{- $url := .URL}}
 {{range $_, $value := .AllFunc}}
 func ({{$ReceiverName}} *{{$StructName}}) {{$value.HandlerName}}({{if $value.ReqBodyName}}req *{{$value.ReqBodyName}}{{end}}) (*{{$value.RespBodyName}}, error) {
 
   {{if $value.ReqBodyName}}var resp {{$value.ReqBodyName}}{{end}}
   code := 0
-  err := gout.{{.Method}}(){{if .Header}}.SetHeader(req.Header){{end}}{{if .Query}}.SetQuery(req.Query){{end}}.SetJSON(req.Body.ReqBody).BindJSON(&resp.Body).Code(&code).Do()
+  err := gout.{{.Method}}({{$url}}, *{{$ReceiverName}}){{if .Header}}.SetHeader(req.Header){{end}}{{if .Query}}.SetQuery(req.Query){{end}}.SetJSON(req.Body.ReqBody).BindJSON(&resp.Body).Code(&code).Do()
   if err != nil {
     return nil,err
   }
@@ -45,7 +46,8 @@ func ({{$ReceiverName}} *{{$StructName}}) {{$value.HandlerName}}({{if $value.Req
 )
 
 type genHTTPClient struct {
-	PackageName  string
+	PackageName  string //包名
+	URL          string //url 地址
 	ReceiverName string //接收器名
 	StructName   string //结构体
 	AllFunc      []Func //func

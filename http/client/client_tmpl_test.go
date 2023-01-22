@@ -1,6 +1,7 @@
-package httpcli
+package client
 
 import (
+	"fmt"
 	"os"
 	"testing"
 )
@@ -15,6 +16,7 @@ func (t *testData) Write(p []byte) (n int, err error) {
 func Test_newFuncTmpl(t *testing.T) {
 
 	g := &genHTTPClient{
+		URL:          fmt.Sprintf("%q", `https://{{.Host}}/{{.Org_name}}/{{.App_name}}/users`),
 		PackageName:  "users",
 		ReceiverName: "u",
 		StructName:   "Users",

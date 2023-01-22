@@ -13,7 +13,7 @@ muilt:
 - handler: Users.CreateUsers 
   reqName: CreateUsersReq
   respName: CreateUsersResp
-  url: https://{host}/{org_name}/{app_name}/users
+  url: https://{{.Host}}/{{.Org_name}}/{{.App_name}}/users
   req:
     method: POST
     header:
