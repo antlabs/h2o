@@ -18,8 +18,11 @@ import (
 	"go/ast"
 	"io/ioutil"
 	"log"
+	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/antlabs/deepcopy"
 )
 
 func genCodeMsg(c *CodeMsg) {
@@ -83,5 +86,12 @@ func (g *Generator) generateCodeMsg(c *CodeMsg, typeName string) {
 		log.Fatalf("no values defined for type %s", typeName)
 	}
 
-	//g.format()
+	tmpl := CodeMsgTmpl{AllVariable: values}
+	deepcopy.Copy(&tmpl, c).Do()
+	tmpl.Args = os.Args[2:]
+	tmpl.PkgName = g.pkg.name
+
+	//tmpl.Gen(os.Stdout)
+	tmpl.Gen(&g.buf)
+	//io.Copy(os.Stdout, bytes.NewReader(g.buf.Bytes()))
 }
