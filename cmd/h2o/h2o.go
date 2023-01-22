@@ -12,6 +12,7 @@ import (
 	"github.com/guonaihong/clop"
 )
 
+// 从json生成结构体
 type JSON struct {
 	NotInline  bool   `clop:"short;long" usage:"controls whether the generated structure is split"`
 	From       string `clop:"short;long" usage:"which file to open from? If it is -, it means reading from stdin"`
@@ -51,6 +52,7 @@ func (j *JSON) SubMain() {
 
 }
 
+// 从yaml生成结构体
 type YAML struct {
 	JSON
 }
