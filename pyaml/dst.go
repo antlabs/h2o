@@ -17,7 +17,7 @@ type Muilt struct {
 	ReqName  string `yaml:"reqName"`
 	Resp     Resp   `yaml:"resp"`
 	RespName string `yaml:"respName"`
-	Url      string `yaml:"url"`
+	URL      string `yaml:"url"`
 	RespType any    `yaml:"respType"`
 }
 

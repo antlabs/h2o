@@ -16,6 +16,7 @@ func (t *testData) Write(p []byte) (n int, err error) {
 func Test_newFuncTmpl(t *testing.T) {
 
 	g := &genHTTPClient{
+		InitField:    []string{"Host", "Org_name", "App_name"},
 		URL:          fmt.Sprintf("%q", `https://{{.Host}}/{{.Org_name}}/{{.App_name}}/users`),
 		PackageName:  "users",
 		ReceiverName: "u",

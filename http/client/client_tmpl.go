@@ -11,11 +11,15 @@ const (
 	httpClientTemplate = `package {{.PackageName}}
 
 import(
+  "fmt"
+
   "github.com/guonaihong/gout"
 )
 
 type {{.StructName}} struct {
-
+  {{- range $_, $value := .InitField}}
+    {{$value}} string
+  {{- end}}
 }
 
 func New() *{{.StructName}} {
@@ -29,7 +33,7 @@ func New() *{{.StructName}} {
 {{range $_, $value := .AllFunc}}
 func ({{$ReceiverName}} *{{$StructName}}) {{$value.HandlerName}}({{if $value.ReqBodyName}}req *{{$value.ReqBodyName}}{{end}}) (*{{$value.RespBodyName}}, error) {
 
-  {{if $value.ReqBodyName}}var resp {{$value.ReqBodyName}}{{end}}
+  {{if $value.ReqBodyName}}var resp {{$value.RespBodyName}}{{end}}
   code := 0
   err := gout.{{.Method}}({{$url}}, *{{$ReceiverName}}){{if .Header}}.SetHeader(req.Header){{end}}{{if .Query}}.SetQuery(req.Query){{end}}.SetJSON(req.Body.ReqBody).BindJSON(&resp.Body).Code(&code).Do()
   if err != nil {
@@ -37,7 +41,7 @@ func ({{$ReceiverName}} *{{$StructName}}) {{$value.HandlerName}}({{if $value.Req
   }
 
   if code != 200 {
-    return, fmt.Errorf("{{$value.HandlerName}} code(%d) != 200", code)
+    return nil, fmt.Errorf("{{$value.HandlerName}} code(%d) != 200", code)
   }
   return &resp, nil
 }
@@ -46,15 +50,16 @@ func ({{$ReceiverName}} *{{$StructName}}) {{$value.HandlerName}}({{if $value.Req
 )
 
 type genHTTPClient struct {
-	PackageName  string //包名
-	URL          string //url 地址
-	ReceiverName string //接收器名
-	StructName   string //结构体
-	AllFunc      []Func //func
+	InitField    []string //初始化的成员字段
+	PackageName  string   //包名
+	URL          string   //url 地址
+	ReceiverName string   //接收器名
+	StructName   string   //结构体
+	AllFunc      []Func   //func
 }
 
 type Func struct {
-	Method       string
+	Method       string   //http方法
 	Header       []string //http header
 	Query        []string //htttp 查询字符串
 	ReqBodyName  string   //请求body名称
