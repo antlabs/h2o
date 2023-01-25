@@ -2,6 +2,8 @@ package http
 
 import (
 	"fmt"
+	"os"
+	"strings"
 
 	"github.com/antlabs/h2o/http/client"
 	"github.com/antlabs/h2o/parser"
@@ -31,6 +33,44 @@ func (h *HTTP) SubMain() {
 			return
 		}
 
-		_ = client.ClientTmpl{PackageName: c.Package, InitField: c.Muilt[0].RespType}
+		tmpl := client.ClientTmpl{PackageName: c.Package,
+			InitField:    c.Init.Resp.Field,
+			StructName:   c.Init.Resp.Name,
+			ReceiverName: string(c.Init.Resp.Name[0]),
+		}
+
+		for _, h := range c.Muilt {
+
+			handler := h.Handler
+			if pos := strings.Index(handler, "."); pos != -1 {
+				handler = handler[pos+1:]
+			}
+
+			// http header
+			var header []string
+			if len(h.Req.Header) > 0 {
+				header = make([]string, 0, len(h.Req.Header)*2)
+				for _, v := range h.Req.Header {
+					pos := strings.Index(v, ":")
+					if pos == -1 {
+						continue
+					}
+					header = append(header, v[:pos])
+					header = append(header, v[pos+1:])
+				}
+			}
+			// query
+
+			tmpl.AllFunc = append(tmpl.AllFunc, client.Func{
+				HandlerName: handler,
+				Method:      h.Req.Method,
+				URL:         h.URL,
+				ReqName:     h.Req.Name,
+				RespName:    h.Resp.Name,
+				Header:      header,
+			})
+
+		}
+		tmpl.Gen(os.Stdout)
 	}
 }

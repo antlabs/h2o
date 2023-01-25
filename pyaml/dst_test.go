@@ -13,6 +13,6 @@ func Test_Parse(t *testing.T) {
 	assert.NoError(t, err)
 
 	for _, d := range p.Muilt {
-		fmt.Printf("%s, %T, %s, %T\n", d.ReqName, d.Req.Body, d.RespName, d.Resp.Body)
+		fmt.Printf("%s, %T, %s, %T\n", d.Req.Name, d.Req.Body, d.Resp.Name, d.Resp.Body)
 	}
 }

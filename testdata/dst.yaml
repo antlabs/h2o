@@ -2,12 +2,11 @@
 package: "users"
 init:
   handler: New #函数名, 名字是New认识是构造函数
-  req:
-    name:  "" #TODO 请求参数, 为空那形参就为空
-    type:   #TODO
+  #req:
+    #field:   #TODO
   resp:
     name: Users #返回的结构体名
-    type:
+    field:
       host: www.xxx.com
       org_name:  ""
       app_name: ""
@@ -15,10 +14,9 @@ muilt:
 
 # 1.开放注册单个用户
 - handler: Users.CreateUsers 
-  reqName: CreateUsersReq
-  respName: CreateUsersResp
   url: https://{{.Host}}/{{.Org_name}}/{{.App_name}}/users
   req:
+    name: CreateUsersReq
     method: POST
     header:
     - 'Content-Type: application/json'
@@ -28,6 +26,7 @@ muilt:
       password: '123'
       nickname: testuser
   resp:
+    name: CreateUsersResp
     body:
       action: post
       application: 8be024f0-e978-XXXX-XXXX-5d598d5f8402
@@ -49,9 +48,8 @@ muilt:
 # 2.授权注册单个用户
 - handler: Users.CreateUsers2
   url: https://{host}/{org_name}/{app_name}/users
-  reqName: CreateUsers2Req
-  respName: CreateUsers2Resp
   req:
+    name: CreateUsers2Req
     method: POST
     header:
     - 'Content-Type: application/json'
@@ -62,6 +60,7 @@ muilt:
         password: '123'
         nickname: testuser
   resp:
+    name: CreateUsers2Resp
     body:
       action: post
       application: 8be024f0-XXXX-XXXX-b697-5d598d5f8402
@@ -82,9 +81,8 @@ muilt:
 # 3.批量注册用户
 - handler: Users.CreateUsers3
   url: https://{host}/{org_name}/{app_name}/users
-  reqName: CreateUsers3Req
-  respName: CreateUsers3Resp
   req:
+    name: CreateUsers3Req
     method: POST
     header:
     - 'Content-Type: application/json'
@@ -97,6 +95,7 @@ muilt:
         password: '456'
         nickname: testuser2
   resp:
+    name: CreateUsers3Resp
     body:
       action: post
       application: 22bcffa0-XXXX-XXXX-9df8-516f6df68c6d

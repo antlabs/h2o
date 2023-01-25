@@ -13,31 +13,29 @@ type Init struct {
 }
 
 type InitReq struct {
-	Name string            `yaml:"name"`
-	Type map[string]string `yaml:"type"`
+	Field map[string]string `yaml:"field"`
 }
 
 type InitResp struct {
-	Name string            `yaml:"name"`
-	Type map[string]string `yaml:"type"`
+	Name  string            `yaml:"name"`
+	Field map[string]string `yaml:"field"`
 }
 
 type Muilt struct {
-	Handler  string            `yaml:"handler"`
-	Req      Req               `yaml:"req"`
-	ReqName  string            `yaml:"reqName"`
-	Resp     Resp              `yaml:"resp"`
-	RespName string            `yaml:"respName"`
-	URL      string            `yaml:"url"`
-	RespType map[string]string `yaml:"respType"`
+	Handler string `yaml:"handler"`
+	Req     Req    `yaml:"req"`
+	Resp    Resp   `yaml:"resp"`
+	URL     string `yaml:"url"`
 }
 
 type Req struct {
+	Name   string   `yaml:"name"`
 	Body   any      `yaml:"body"`
 	Header []string `yaml:"header"`
 	Method string   `yaml:"method"`
 }
 
 type Resp struct {
-	Body any `yaml:"body"`
+	Name string `yaml:"name"`
+	Body any    `yaml:"body"`
 }

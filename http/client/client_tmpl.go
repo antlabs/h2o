@@ -34,9 +34,9 @@ func New() *{{.StructName}} {
   {{- $ReceiverName := .ReceiverName}}
   {{- $StructName := .StructName}}
 {{- range $_, $value := .AllFunc}}
-func ({{$ReceiverName}} *{{$StructName}}) {{$value.HandlerName}}({{if $value.ReqBodyName}}req *{{$value.ReqBodyName}}{{end}}) (*{{$value.RespBodyName}}, error) {
+func ({{$ReceiverName}} *{{$StructName}}) {{$value.HandlerName}}({{if $value.ReqName}}req *{{$value.ReqName}}{{end}}) (*{{$value.RespName}}, error) {
 
-  {{if $value.ReqBodyName}}var resp {{$value.RespBodyName}}{{end}}
+  {{if $value.ReqName}}var resp {{$value.RespName}}{{end}}
   code := 0
   err := gout.{{.Method}}({{$value.URL}}, *{{$ReceiverName}}){{if .Header}}.SetHeader(req.Header){{end}}{{if .Query}}.SetQuery(req.Query){{end}}.SetJSON(req.Body.ReqBody).BindJSON(&resp.Body).Code(&code).Do()
   if err != nil {
@@ -61,13 +61,13 @@ type ClientTmpl struct {
 }
 
 type Func struct {
-	URL          string   //url 地址
-	Method       string   //http方法
-	Header       []string //http header
-	Query        []string //htttp 查询字符串
-	ReqBodyName  string   //请求body名称
-	RespBodyName string   //请求body名称
-	HandlerName  string   //生成的函数名
+	URL         string   //url 地址
+	Method      string   //http方法
+	Header      []string //http header
+	Query       []string //htttp 查询字符串
+	ReqName     string   //函数请求参数名
+	RespName    string   //函数响应参数名
+	HandlerName string   //生成的函数名
 }
 
 func newFuncTemplate() *template.Template {
