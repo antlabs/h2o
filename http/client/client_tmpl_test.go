@@ -1,7 +1,6 @@
 package client
 
 import (
-	"fmt"
 	"os"
 	"testing"
 )
@@ -24,7 +23,7 @@ func Test_newFuncTmpl(t *testing.T) {
 		ReceiverName: "u",
 		StructName:   "Users",
 		AllFunc: []Func{{
-			URL:         fmt.Sprintf("%q", `https://{{.Host}}/{{.Org_name}}/{{.App_name}}/users`),
+			URL:         `https://{{.Host}}/{{.Org_name}}/{{.App_name}}/users`,
 			Method:      "POST",
 			Header:      []string{"h1", "h1value", "h2", "h2value"},
 			HandlerName: "CreateUser",

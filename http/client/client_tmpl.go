@@ -38,7 +38,7 @@ func ({{$ReceiverName}} *{{$StructName}}) {{$value.HandlerName}}({{if $value.Req
 
   {{if $value.ReqName}}var resp {{$value.RespName}}{{end}}
   code := 0
-  err := gout.{{.Method}}({{$value.URL}}, *{{$ReceiverName}}){{if .Header}}.SetHeader(req.Header){{end}}{{if .Query}}.SetQuery(req.Query){{end}}.SetJSON(req.Body.ReqBody).BindJSON(&resp.Body).Code(&code).Do()
+  err := gout.{{.Method}}({{$value.URL|printf "%q"}}, *{{$ReceiverName}}){{if .Header}}.SetHeader(req.Header){{end}}{{if .Query}}.SetQuery(req.Query){{end}}.SetJSON(req.Body.ReqBody).BindJSON(&resp.Body).Code(&code).Do()
   if err != nil {
     return nil,err
   }
