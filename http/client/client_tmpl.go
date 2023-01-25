@@ -17,13 +17,17 @@ import(
 )
 
 type {{.StructName}} struct {
-  {{- range $_, $value := .InitField}}
-    {{$value}} string
+  {{- range $key, $value := .InitField}}
+    {{$key}} string
   {{- end}}
 }
 
 func New() *{{.StructName}} {
-  return &{{.StructName}}{}
+  return &{{.StructName}}{
+  {{- range $key, $value := .InitField}}
+    {{$key}}:{{$value|printf "%q"}},
+  {{- end}}
+  }
 }
 
 // 函数
@@ -49,13 +53,13 @@ func ({{$ReceiverName}} *{{$StructName}}) {{$value.HandlerName}}({{if $value.Req
  `
 )
 
-type genHTTPClient struct {
-	InitField    []string //初始化的成员字段
-	PackageName  string   //包名
-	URL          string   //url 地址
-	ReceiverName string   //接收器名
-	StructName   string   //结构体
-	AllFunc      []Func   //func
+type ClientTmpl struct {
+	InitField    map[string]any //初始化的成员字段
+	PackageName  string         //包名
+	URL          string         //url 地址
+	ReceiverName string         //接收器名
+	StructName   string         //结构体
+	AllFunc      []Func         //func
 }
 
 type Func struct {
@@ -72,7 +76,7 @@ func newFuncTemplate() *template.Template {
 	return template.Must(template.New("h2o-http-client-tmpl").Parse(tmpl))
 }
 
-func (h *genHTTPClient) Gen(w io.Writer) {
+func (h *ClientTmpl) Gen(w io.Writer) {
 	tpl := newFuncTemplate()
 	tpl.Execute(w, *h)
 }
