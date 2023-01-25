@@ -1,13 +1,17 @@
 ---
 package: "users"
+init:
+  handler: New #函数名, 名字是New认识是构造函数
+  req:
+    name:  "" #TODO 请求参数, 为空那形参就为空
+    type:   #TODO
+  resp:
+    name: Users #返回的结构体名
+    type:
+      host: www.xxx.com
+      org_name:  ""
+      app_name: ""
 muilt:
-- handler: New #函数名, 名字是New认识是构造函数
-  reqName: #请求参数, 为空那形参就为空
-  respName: Users #返回的结构体名
-  respType:       #返回的结构体类型
-    host: www.xxx.com
-    org_name: 
-    app_name:
 
 # 1.开放注册单个用户
 - handler: Users.CreateUsers 

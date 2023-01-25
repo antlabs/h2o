@@ -30,16 +30,15 @@ func New() *{{.StructName}} {
   }
 }
 
-// 函数
+// 成员函数
   {{- $ReceiverName := .ReceiverName}}
   {{- $StructName := .StructName}}
-  {{- $url := .URL}}
-{{range $_, $value := .AllFunc}}
+{{- range $_, $value := .AllFunc}}
 func ({{$ReceiverName}} *{{$StructName}}) {{$value.HandlerName}}({{if $value.ReqBodyName}}req *{{$value.ReqBodyName}}{{end}}) (*{{$value.RespBodyName}}, error) {
 
   {{if $value.ReqBodyName}}var resp {{$value.RespBodyName}}{{end}}
   code := 0
-  err := gout.{{.Method}}({{$url}}, *{{$ReceiverName}}){{if .Header}}.SetHeader(req.Header){{end}}{{if .Query}}.SetQuery(req.Query){{end}}.SetJSON(req.Body.ReqBody).BindJSON(&resp.Body).Code(&code).Do()
+  err := gout.{{.Method}}({{$value.URL}}, *{{$ReceiverName}}){{if .Header}}.SetHeader(req.Header){{end}}{{if .Query}}.SetQuery(req.Query){{end}}.SetJSON(req.Body.ReqBody).BindJSON(&resp.Body).Code(&code).Do()
   if err != nil {
     return nil,err
   }
@@ -54,15 +53,15 @@ func ({{$ReceiverName}} *{{$StructName}}) {{$value.HandlerName}}({{if $value.Req
 )
 
 type ClientTmpl struct {
-	InitField    map[string]any //初始化的成员字段
-	PackageName  string         //包名
-	URL          string         //url 地址
-	ReceiverName string         //接收器名
-	StructName   string         //结构体
-	AllFunc      []Func         //func
+	InitField    map[string]string //初始化的成员字段
+	PackageName  string            //包名
+	ReceiverName string            //接收器名
+	StructName   string            //结构体
+	AllFunc      []Func            //func
 }
 
 type Func struct {
+	URL          string   //url 地址
 	Method       string   //http方法
 	Header       []string //http header
 	Query        []string //htttp 查询字符串

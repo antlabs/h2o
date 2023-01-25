@@ -31,7 +31,6 @@ func (h *HTTP) SubMain() {
 			return
 		}
 
-		_ = c
-		_ = client.ClientTmpl{}
+		_ = client.ClientTmpl{PackageName: c.Package, InitField: c.Muilt[0].RespType}
 	}
 }
