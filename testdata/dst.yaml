@@ -7,9 +7,9 @@ init:
   resp:
     name: Users #返回的结构体名
     field:
-      host: www.xxx.com
-      org_name:  ""
-      app_name: ""
+      Host: www.xxx.com
+      Org_name:  ""
+      App_name: ""
 muilt:
 
 # 1.开放注册单个用户

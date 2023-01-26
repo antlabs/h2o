@@ -21,17 +21,31 @@ package {{.PackageName}}
       {{if $value.Resp.Body.Name}} Body {{$value.Resp.Body.Name}} {{end}}
     }
 
+    {{if $value.Req.Query.StructType}}
     // 查询字符串结构体
     {{$value.Req.Query.StructType}}
+    {{end}}
+
+    {{if $value.Req.Header.StructType}}
     // 请求头结构体
     {{$value.Req.Header.StructType}}
+    {{end}}
+
+    {{if $value.Req.Body.StructType}}
     // 请求body结构体
     {{$value.Req.Body.StructType}}
+    {{end}}
 
+    {{if $value.Resp.Header.StructType}}
     // 响应头结构体
     {{$value.Resp.Header.StructType}}
+    {{end}}
+
+    {{if $value.Resp.Body.StructType}}
     // 响应body结构体
     {{$value.Resp.Body.StructType}}
+    {{end}}
+
   {{end}}
   `
 )
