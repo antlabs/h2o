@@ -7,6 +7,8 @@ import (
 
 	"github.com/antlabs/h2o/http/client"
 	"github.com/antlabs/h2o/parser"
+	"github.com/antlabs/tostruct/option"
+	"github.com/antlabs/tostruct/url"
 )
 
 // 生成客户端代码
@@ -59,18 +61,22 @@ func (h *HTTP) SubMain() {
 					header = append(header, v[pos+1:])
 				}
 			}
-			// query
 
+			queryName := h.Req.Name + "Query"
+			all, err := url.Marshal(h.URL, option.WithStructName(queryName), option.WithTagName("query"))
 			tmpl.AllFunc = append(tmpl.AllFunc, client.Func{
 				HandlerName: handler,
 				Method:      h.Req.Method,
 				URL:         h.URL,
 				ReqName:     h.Req.Name,
 				RespName:    h.Resp.Name,
-				Header:      header,
+				HaveHeader:  len(h.Req.Header) > 0,
 			})
 
+			_ = err
+			_ = all
 		}
+
 		tmpl.Gen(os.Stdout)
 	}
 }

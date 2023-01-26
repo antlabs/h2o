@@ -38,7 +38,7 @@ func ({{$ReceiverName}} *{{$StructName}}) {{$value.HandlerName}}({{if $value.Req
 
   {{if $value.ReqName}}var resp {{$value.RespName}}{{end}}
   code := 0
-  err := gout.{{.Method}}({{$value.URL|printf "%q"}}, *{{$ReceiverName}}){{if .Header}}.SetHeader(req.Header){{end}}{{if .Query}}.SetQuery(req.Query){{end}}.SetJSON(req.Body.ReqBody).BindJSON(&resp.Body).Code(&code).Do()
+  err := gout.{{.Method}}({{$value.URL|printf "%q"}}, *{{$ReceiverName}}){{if .HaveHeader}}.SetHeader(req.Header){{end}}{{if .HaveQuery}}.SetQuery(req.Query){{end}}.SetJSON(req.Body.ReqBody).BindJSON(&resp.Body).Code(&code).Do()
   if err != nil {
     return nil,err
   }
@@ -61,13 +61,13 @@ type ClientTmpl struct {
 }
 
 type Func struct {
-	URL         string   //url 地址
-	Method      string   //http方法
-	Header      []string //http header
-	Query       []string //htttp 查询字符串
-	ReqName     string   //函数请求参数名
-	RespName    string   //函数响应参数名
-	HandlerName string   //生成的函数名
+	URL         string //url 地址
+	Method      string //http方法
+	HaveHeader  bool   //有http header
+	HaveQuery   bool   //有查询字符串
+	ReqName     string //函数请求参数名
+	RespName    string //函数响应参数名
+	HandlerName string //生成的函数名
 }
 
 func newFuncTemplate() *template.Template {
