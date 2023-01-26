@@ -34,7 +34,7 @@ func New() *{{.StructName}} {
 {{- $ReceiverName := .ReceiverName}}
 {{- $StructName := .StructName}}
 {{- range $key, $value := .InitField}}
-func ({{$ReceiverName}} *{{$StructName}}) ({{$key}} string) *{{$StructName}} {
+func ({{$ReceiverName}} *{{$StructName}}) Set{{$key}} ({{$key}} string) *{{$StructName}} {
   {{$ReceiverName}}.{{$key}} = {{$key}}
   return {{$ReceiverName}} 
 }
@@ -47,7 +47,13 @@ func ({{$ReceiverName}} *{{$StructName}}) {{$value.HandlerName}}({{if $value.Req
 
   {{if $value.ReqName}}var resp {{$value.RespName}}{{end}}
   code := 0
-  err := gout.{{.Method}}({{$value.URL|printf "%q"}}, *{{$ReceiverName}}){{if .HaveHeader}}.SetHeader(req.Header){{end}}{{if .HaveQuery}}.SetQuery(req.Query){{end}}.SetJSON(req.Body).BindJSON(&resp.Body).Code(&code).Do()
+  err := gout.{{.Method}}({{$value.URL|printf "%q"}}, *{{$ReceiverName}}){{if .HaveHeader}}.
+  SetHeader(req.Header){{end}}{{if .HaveQuery}}.
+  SetQuery(req.Query){{end}}{{if .HaveReqBody}}.
+  SetJSON(req.Body){{end}}.
+  BindJSON(&resp.Body).
+  Code(&code).
+  Do()
   if err != nil {
     return nil,err
   }
@@ -74,6 +80,7 @@ type Func struct {
 	Method      string //http方法
 	HaveHeader  bool   //有http header
 	HaveQuery   bool   //有查询字符串
+	HaveReqBody bool   //有请求body
 	ReqName     string //函数请求参数名
 	RespName    string //函数响应参数名
 	HandlerName string //生成的函数名

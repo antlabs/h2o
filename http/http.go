@@ -42,6 +42,8 @@ func getBody(name string, bodyData any) (body client.Body, err error) {
 		data, err = json.Marshal(v, option.WithStructName(body.Name), option.WithTagName("json"))
 	case []any:
 		data, err = json.Marshal(v, option.WithStructName(body.Name), option.WithTagName("json"))
+	default:
+		body.Name = ""
 	}
 
 	body.StructType = string(data)
@@ -170,6 +172,7 @@ func (h *HTTP) SubMain() {
 				ReqName:     h.Req.Name,
 				RespName:    h.Resp.Name,
 				HaveHeader:  len(h.Req.Header) > 0,
+				HaveReqBody: h.Req.Body != nil,
 			})
 		}
 
@@ -184,7 +187,8 @@ func (h *HTTP) SubMain() {
 			tmpl.Gen(&funcBuf)
 			fmtType, err := format.Source(funcBuf.Bytes())
 			if err != nil {
-				fmt.Printf("fmt fail:%s\n", err)
+				fmt.Printf("fmt func fail:%s\n", err)
+				os.Stdout.Write(funcBuf.Bytes())
 				return
 			}
 
@@ -198,7 +202,7 @@ func (h *HTTP) SubMain() {
 			tmplType.Gen(&typeBuf)
 			fmtType, err := format.Source(typeBuf.Bytes())
 			if err != nil {
-				fmt.Printf("fmt fail:%s\n", err)
+				fmt.Printf("fmt type fail:%s\n", err)
 				return
 			}
 
