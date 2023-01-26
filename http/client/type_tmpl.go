@@ -7,28 +7,30 @@ import (
 
 const (
 	httpTypeTemplate = `
-  type {{.Req.Name}} struct {
-    Query {{.Req.QueryName}}
-    Body {{.Req.BodyName}}
-    Header {{.Req.HeaderName}}
-  }
+  {{range $value := ReqResp}}
+    type {{$value.Req.Name}} struct {
+      Query {{$value.Req.QueryName}}
+      Body {{$value.Req.BodyName}}
+      Header {{$value.Req.HeaderName}}
+    }
 
-  type {{.Resp.Name}} struct {
-    Header {{.Resp.HeaderName}}
-    Body {{.Resp.BodyName}}
-  }
+    type {{$value.Resp.Name}} struct {
+      Header {{$value.Resp.Header.Name}}
+      Body {{$value.Resp.Body.Name}}
+    }
 
-  // 查询字符串结构体
-  {{.ReqQueryStruct}}
-  // 请求头结构体
-  {{.ReqHeaderStruct}}
-  // 请求body结构体
-  {{.ReqBodyStruct}}
+    // 查询字符串结构体
+    {{$value.Req.Query.StructType}}
+    // 请求头结构体
+    {{$value.Req.Header.StructType}}
+    // 请求body结构体
+    {{$value.Req.Body.StructType}}
 
-  // 响应头结构体
-  {{.RespHeaderStruct}}
-  // 响应body结构体
-  {{.RespBodyStruct}}
+    // 响应头结构体
+    {{$value.Resp.Header.StructType}}
+    // 响应body结构体
+    {{$value.Resp.Body.StructType}}
+  {{end}}
   `
 )
 
@@ -55,13 +57,17 @@ type Req struct {
 }
 
 type Resp struct {
+	Name   string
 	Body   Body   //响应body结构体名
 	Header Header //响应header结构体名
 }
 
-type TypeTmpl struct {
+type ReqResp struct {
 	Req  Req  //请求
 	Resp Resp //响应
+}
+type TypeTmpl struct {
+	ReqResp []ReqResp
 }
 
 func newTypeTemplate() *template.Template {

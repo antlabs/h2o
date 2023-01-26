@@ -14,10 +14,10 @@ muilt:
 
 # 1.开放注册单个用户
 - handler: Users.CreateUsers 
-  url: https://{{.Host}}/{{.Org_name}}/{{.App_name}}/users
   req:
     name: CreateUsersReq
     method: POST
+    url: https://{{.Host}}/{{.Org_name}}/{{.App_name}}/users
     header:
     - 'Content-Type: application/json'
     - 'Accept: application/json'
@@ -47,9 +47,9 @@ muilt:
 
 # 2.授权注册单个用户
 - handler: Users.CreateUsers2
-  url: https://{host}/{org_name}/{app_name}/users
   req:
     name: CreateUsers2Req
+    url: https://{host}/{org_name}/{app_name}/users
     method: POST
     header:
     - 'Content-Type: application/json'
@@ -80,9 +80,9 @@ muilt:
       applicationName: XXXX
 # 3.批量注册用户
 - handler: Users.CreateUsers3
-  url: https://{host}/{org_name}/{app_name}/users
   req:
     name: CreateUsers3Req
+    url: https://{host}/{org_name}/{app_name}/users
     method: POST
     header:
     - 'Content-Type: application/json'

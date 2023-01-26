@@ -25,10 +25,10 @@ type Muilt struct {
 	Handler string `yaml:"handler"`
 	Req     Req    `yaml:"req"`
 	Resp    Resp   `yaml:"resp"`
-	URL     string `yaml:"url"`
 }
 
 type Req struct {
+	URL    string   `yaml:"url"`
 	Name   string   `yaml:"name"`
 	Body   any      `yaml:"body"`
 	Header []string `yaml:"header"`
@@ -36,6 +36,7 @@ type Req struct {
 }
 
 type Resp struct {
-	Name string `yaml:"name"`
-	Body any    `yaml:"body"`
+	Name   string   `yaml:"name"`
+	Body   any      `yaml:"body"`
+	Header []string `yaml:"header"`
 }
