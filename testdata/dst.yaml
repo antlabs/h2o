@@ -10,6 +10,7 @@ init:
       Host: www.xxx.com
       Org_name:  ""
       App_name: ""
+      UserName: ""
 muilt:
 
 # 1.开放注册单个用户
@@ -121,3 +122,73 @@ muilt:
       duration: 0
       organization: XXXX
       applicationName: XXXX
+
+# 4.获取单个用户的详情
+- handler: Users.GetUser
+  req:
+    name: GetUserReq
+    url: https://{{.Host}}/{{.Org_name}}/{{.App_name}}/users/{{.UserName}}
+    method: GET
+    header:
+    - 'Content-Type: application/json'
+    - 'Authorization:'
+    body:
+  resp:
+    name: GetUserResp
+    body:
+      action: get
+      path: "/users"
+      uri: http://XXXX/XXXX/XXXX/users/XXXX
+      entities:
+      - uuid: 0ffe2d80-XXXX-XXXX-8d66-279e3e1c214b
+        type: user
+        created: 1542795196504
+        modified: 1542795196504
+        username: XXXX
+        activated: true
+        nickname: testuser
+      timestamp: 1542798985011
+      duration: 6
+      count: 1
+
+# 5.获取用户列表
+- handler: Users.GetUserList
+  req:
+    name: GetUserListReq
+    url: https://{{.Host}}/{{.Org_name}}/{.App_name}/users?limit=2&cursor=LTgzXXXXtB
+
+    method: GET
+    header:
+      #- 'Content-Type: application/json'
+    - 'Accept: application/json'
+    - 'Authorization:'
+    body:
+  resp:
+    name: GetUserListResp
+    body:
+      action: get
+      params:
+        limit:
+        - '2'
+      path: "/users"
+      uri: http://XXXX/XXXX/XXXX/users
+      entities:
+      - uuid: ab90eff0-XXXX-XXXX-9174-8f161649a182
+        type: user
+        created: 1542356511855
+        modified: 1542356511855
+        username: XXXX
+        activated: true
+        nickname: user1
+      - uuid: b2aade90-XXXX-XXXX-a974-f3368f82e4f1
+        type: user
+        created: 1542356523769
+        modified: 1542356523769
+        username: user2
+        activated: true
+        nickname: user2
+      timestamp: 1542558467056
+      duration: 11
+      cursor: LTgzXXXX2tB
+      count: 2
+

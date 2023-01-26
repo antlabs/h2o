@@ -30,9 +30,18 @@ func New() *{{.StructName}} {
   }
 }
 
+// set xxx 成员函数
+{{- $ReceiverName := .ReceiverName}}
+{{- $StructName := .StructName}}
+{{- range $key, $value := .InitField}}
+func ({{$ReceiverName}} *{{$StructName}}) ({{$key}} string) *{{$StructName}} {
+  {{$ReceiverName}}.{{$key}} = {{$key}}
+  return {{$ReceiverName}} 
+}
+{{- end}}
+
 // 成员函数
-  {{- $ReceiverName := .ReceiverName}}
-  {{- $StructName := .StructName}}
+
 {{- range $_, $value := .AllFunc}}
 func ({{$ReceiverName}} *{{$StructName}}) {{$value.HandlerName}}({{if $value.ReqName}}req *{{$value.ReqName}}{{end}}) (*{{$value.RespName}}, error) {
 
