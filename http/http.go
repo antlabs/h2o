@@ -11,7 +11,6 @@ import (
 	"github.com/antlabs/tostruct/header"
 	"github.com/antlabs/tostruct/json"
 	"github.com/antlabs/tostruct/option"
-	"github.com/antlabs/tostruct/url"
 )
 
 // 生成客户端代码
@@ -51,7 +50,7 @@ func getHeader(name string, headerArray []string) (htmpl client.Header, err erro
 	}
 
 	htmpl.Name = name
-	var hmap http.Header
+	hmap := make(http.Header)
 	for _, v := range headerArray {
 		pos := strings.Index(v, ":")
 		if pos == -1 {
@@ -94,13 +93,15 @@ func (h *HTTP) SubMain() {
 
 			var query client.Query
 			if len(h.Req.URL) > 0 {
-				query.Name = h.Req.Name + "Query"
-				all, err := url.Marshal(h.Req.URL, option.WithStructName(query.Name), option.WithTagName("query"))
-				query.StructType = all
-				if err != nil {
-					fmt.Printf("marshal query string fail:%s\n", err)
-					return
-				}
+				/*
+					query.Name = h.Req.Name + "Query"
+					all, err := url.Marshal(h.Req.URL, option.WithStructName(query.Name), option.WithTagName("query"))
+					query.StructType = all
+					if err != nil {
+						fmt.Printf("marshal query string fail:%s\n", err)
+						return
+					}
+				*/
 			}
 
 			reqHeader, err := getHeader(h.Req.Name+"Header", h.Req.Header)

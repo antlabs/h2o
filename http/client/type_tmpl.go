@@ -7,7 +7,7 @@ import (
 
 const (
 	httpTypeTemplate = `
-  {{range $value := ReqResp}}
+  {{range $value := .ReqResp}}
     type {{$value.Req.Name}} struct {
       Query {{$value.Req.QueryName}}
       Body {{$value.Req.BodyName}}
@@ -71,11 +71,11 @@ type TypeTmpl struct {
 }
 
 func newTypeTemplate() *template.Template {
-	tmpl := httpClientTemplate
+	tmpl := httpTypeTemplate
 	return template.Must(template.New("h2o-http-client-type-tmpl").Parse(tmpl))
 }
 
 func (t *TypeTmpl) Gen(w io.Writer) {
-	tpl := newFuncTemplate()
+	tpl := newTypeTemplate()
 	tpl.Execute(w, *t)
 }
