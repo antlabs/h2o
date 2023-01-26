@@ -1,9 +1,12 @@
 package http
 
 import (
+	"bytes"
 	"fmt"
+	"go/format"
 	"net/http"
 	"os"
+	"path"
 	"strings"
 
 	"github.com/antlabs/h2o/http/client"
@@ -26,6 +29,7 @@ import (
 type HTTP struct {
 	File []string `clop:"short;long;greedy" usage:"Parsing dst files" valid:"required"`
 	Gen  []string `clop:"short;long;greedy" usage:"Generate client or server code" valid:"required"`
+	Dir  string   `clop:"short;long" usage:"gen dir" default:"."`
 }
 
 func getBody(name string, bodyData any) (body client.Body, err error) {
@@ -69,6 +73,18 @@ func getHeader(name string, headerArray []string) (htmpl client.Header, err erro
 
 	htmpl.StructType = string(data)
 	return
+}
+
+func exists(path string) (bool, error) {
+	_, err := os.Stat(path)
+	if err == nil {
+		return true, nil
+	}
+
+	if os.IsNotExist(err) {
+		return false, nil
+	}
+	return false, err
 }
 
 func (h *HTTP) SubMain() {
@@ -157,7 +173,36 @@ func (h *HTTP) SubMain() {
 			})
 		}
 
-		tmpl.Gen(os.Stdout)
-		tmplType.Gen(os.Stdout)
+		dir := h.Dir + "/" + tmpl.PackageName
+		dir = path.Clean(dir)
+		os.MkdirAll(dir, 0755)
+
+		funcFileName := dir + tmpl.PackageName + ".go"
+		if b, _ := exists(funcFileName); !b {
+
+			var funcBuf bytes.Buffer
+			tmpl.Gen(&funcBuf)
+			fmtType, err := format.Source(funcBuf.Bytes())
+			if err != nil {
+				fmt.Printf("fmt fail:%s\n", err)
+				return
+			}
+
+			os.WriteFile(funcFileName, fmtType, 0644)
+		}
+
+		typeFileName := dir + tmpl.PackageName + "_type.go"
+		if b, _ := exists(typeFileName); !b {
+
+			var typeBuf bytes.Buffer
+			tmplType.Gen(&typeBuf)
+			fmtType, err := format.Source(typeBuf.Bytes())
+			if err != nil {
+				fmt.Printf("fmt fail:%s\n", err)
+				return
+			}
+
+			os.Stdout.Write(fmtType)
+		}
 	}
 }

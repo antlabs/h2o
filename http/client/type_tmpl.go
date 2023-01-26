@@ -10,13 +10,13 @@ const (
   {{range $value := .ReqResp}}
     type {{$value.Req.Name}} struct {
       {{if $value.Req.Query.Name}} Query {{$value.Req.QueryName}} {{end}}
-      Body {{$value.Req.Body.Name}}
-      Header {{$value.Req.Header.Name}}
+      {{if $value.Req.Body.Name }} Body {{$value.Req.Body.Name}} {{end}}
+      {{if $value.Req.Header.Name}} Header {{$value.Req.Header.Name}} {{end}}
     }
 
     type {{$value.Resp.Name}} struct {
-      Header {{$value.Resp.Header.Name}}
-      Body {{$value.Resp.Body.Name}}
+      {{if $value.Resp.Header.Name}} Header {{$value.Resp.Header.Name}} {{end}}
+      {{if $value.Resp.Body.Name}} Body {{$value.Resp.Body.Name}} {{end}}
     }
 
     // 查询字符串结构体
@@ -66,6 +66,7 @@ type ReqResp struct {
 	Req  Req  //请求
 	Resp Resp //响应
 }
+
 type TypeTmpl struct {
 	ReqResp []ReqResp
 }
