@@ -102,7 +102,7 @@ func (h *HTTP) SubMain() {
 			ReceiverName: string(c.Init.Resp.Name[0]),
 		}
 
-		tmplType := client.TypeTmpl{}
+		tmplType := client.TypeTmpl{PackageName: c.Package}
 
 		for _, h := range c.Muilt {
 
@@ -177,7 +177,7 @@ func (h *HTTP) SubMain() {
 		dir = path.Clean(dir)
 		os.MkdirAll(dir, 0755)
 
-		funcFileName := dir + tmpl.PackageName + ".go"
+		funcFileName := dir + "/" + tmpl.PackageName + ".go"
 		if b, _ := exists(funcFileName); !b {
 
 			var funcBuf bytes.Buffer
@@ -191,7 +191,7 @@ func (h *HTTP) SubMain() {
 			os.WriteFile(funcFileName, fmtType, 0644)
 		}
 
-		typeFileName := dir + tmpl.PackageName + "_type.go"
+		typeFileName := dir + "/" + tmpl.PackageName + "_type.go"
 		if b, _ := exists(typeFileName); !b {
 
 			var typeBuf bytes.Buffer
@@ -202,7 +202,8 @@ func (h *HTTP) SubMain() {
 				return
 			}
 
-			os.Stdout.Write(fmtType)
+			//os.Stdout.Write(fmtType)
+			os.WriteFile(typeFileName, fmtType, 0644)
 		}
 	}
 }

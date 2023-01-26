@@ -7,6 +7,8 @@ import (
 
 const (
 	httpTypeTemplate = `
+package {{.PackageName}}
+
   {{range $value := .ReqResp}}
     type {{$value.Req.Name}} struct {
       {{if $value.Req.Query.Name}} Query {{$value.Req.QueryName}} {{end}}
@@ -68,7 +70,8 @@ type ReqResp struct {
 }
 
 type TypeTmpl struct {
-	ReqResp []ReqResp
+	PackageName string
+	ReqResp     []ReqResp
 }
 
 func newTypeTemplate() *template.Template {
