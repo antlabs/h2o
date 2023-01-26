@@ -9,9 +9,9 @@ const (
 	httpTypeTemplate = `
   {{range $value := .ReqResp}}
     type {{$value.Req.Name}} struct {
-      Query {{$value.Req.QueryName}}
-      Body {{$value.Req.BodyName}}
-      Header {{$value.Req.HeaderName}}
+      {{if $value.Req.Query.Name}} Query {{$value.Req.QueryName}} {{end}}
+      Body {{$value.Req.Body.Name}}
+      Header {{$value.Req.Header.Name}}
     }
 
     type {{$value.Resp.Name}} struct {
@@ -36,17 +36,17 @@ const (
 
 type Query struct {
 	Name       string
-	StructType []byte
+	StructType string
 }
 
 type Body struct {
 	Name       string
-	StructType []byte
+	StructType string
 }
 
 type Header struct {
 	Name       string
-	StructType []byte
+	StructType string
 }
 
 type Req struct {

@@ -32,13 +32,15 @@ func getBody(name string, bodyData any) (body client.Body, err error) {
 
 	body.Name = name + "Body"
 
+	var data []byte
 	switch v := bodyData.(type) {
 	case map[string]any:
-		body.StructType, err = json.Marshal(v, option.WithStructName(body.Name), option.WithTagName("json"))
+		data, err = json.Marshal(v, option.WithStructName(body.Name), option.WithTagName("json"))
 	case []any:
-		body.StructType, err = json.Marshal(v, option.WithStructName(body.Name), option.WithTagName("json"))
+		data, err = json.Marshal(v, option.WithStructName(body.Name), option.WithTagName("json"))
 	}
 
+	body.StructType = string(data)
 	return
 }
 
@@ -59,11 +61,13 @@ func getHeader(name string, headerArray []string) (htmpl client.Header, err erro
 		hmap.Set(v[:pos], v[pos+1:])
 	}
 
-	htmpl.StructType, err = header.Marshal(hmap, option.WithStructName(htmpl.Name), option.WithTagName("header"))
+	var data []byte
+	data, err = header.Marshal(hmap, option.WithStructName(htmpl.Name), option.WithTagName("header"))
 	if err != nil {
 		return
 	}
 
+	htmpl.StructType = string(data)
 	return
 }
 
