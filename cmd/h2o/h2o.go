@@ -67,9 +67,9 @@ func (y *YAML) SubMain() {
 // 主命令
 type H2O struct {
 	// 子命令，入口函数是SubMain
-	JSON JSON `clop:"subcommand" usage:"Generate structure from json"`
+	JSONStruct JSON `clop:"subcommand" usage:"Generate structure from json"`
 	// 子命令，入口函数是SubMain
-	YAML YAML `clop:"subcommand" usage:"Generate structure from yaml"`
+	YAMLStruct YAML `clop:"subcommand" usage:"Generate structure from yaml"`
 	//子命令， 入口是SubMain
 	CodeMsg codemsg.CodeMsg `clop:"subcommand" usage:"Generate code in codemsg format from constants"`
 
