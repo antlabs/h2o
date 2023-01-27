@@ -492,6 +492,8 @@ muilt:
     body:
   resp:
     name: UserOfflineMsgStatusResp
+    newType:
+      ".data": map[string]string
     body:
       action: get
       uri: http://XXXX/XXXX/XXXX/users/user1/offline_msg_status/123

@@ -28,15 +28,17 @@ type Muilt struct {
 }
 
 type Req struct {
-	URL    string   `yaml:"url"`
-	Name   string   `yaml:"name"`
-	Body   any      `yaml:"body"`
-	Header []string `yaml:"header"`
-	Method string   `yaml:"method"`
+	URL     string            `yaml:"url"`
+	Name    string            `yaml:"name"`
+	NewType map[string]string `yaml:"newType"`
+	Body    any               `yaml:"body"`
+	Header  []string          `yaml:"header"`
+	Method  string            `yaml:"method"`
 }
 
 type Resp struct {
-	Name   string   `yaml:"name"`
-	Body   any      `yaml:"body"`
-	Header []string `yaml:"header"`
+	Name    string            `yaml:"name"`
+	NewType map[string]string `yaml:"newType"`
+	Body    any               `yaml:"body"`
+	Header  []string          `yaml:"header"`
 }

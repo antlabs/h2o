@@ -34,19 +34,20 @@ type HTTP struct {
 	Dir  string   `clop:"short;long" usage:"gen dir" default:"."`
 }
 
-func getBody(name string, bodyData any) (body client.Body, err error) {
+func getBody(name string, bodyData any, newType map[string]string) (body client.Body, err error) {
 
 	if bodyData == nil {
-		return
+		//return
 	}
+
 	body.Name = name + "Body"
 
 	var data []byte
 	switch v := bodyData.(type) {
 	case map[string]any:
-		data, err = json.Marshal(v, option.WithStructName(body.Name), option.WithTagName("json"))
+		data, err = json.Marshal(v, option.WithStructName(body.Name), option.WithTagName("json"), option.WithSpecifyType(newType))
 	case []any:
-		data, err = json.Marshal(v, option.WithStructName(body.Name), option.WithTagName("json"))
+		data, err = json.Marshal(v, option.WithStructName(body.Name), option.WithTagName("json"), option.WithSpecifyType(newType))
 	default:
 		body.Name = ""
 	}
@@ -147,22 +148,18 @@ func (h *HTTP) SubMain() {
 				return
 			}
 
-			reqBody, err := getBody(h.Req.Name, h.Req.Body)
+			reqBody, err := getBody(h.Req.Name, h.Req.Body, h.Req.NewType)
 			if err != nil {
 				fmt.Printf("get request body:%s\n", err)
 				return
 			}
 
-			var respBody client.Body
-			if h.Resp.Body != nil {
-
-				respBody, err = getBody(h.Resp.Name, h.Resp.Body)
-				if err != nil {
-					fmt.Printf("get response body:%s\n", err)
-					all, err := stdjson.Marshal(h.Req.Body)
-					fmt.Println(string(all), err, h.Req.Body == nil)
-					return
-				}
+			respBody, err := getBody(h.Resp.Name, h.Resp.Body, h.Resp.NewType)
+			if err != nil {
+				fmt.Printf("get response body:%s \n", err)
+				all, _ := stdjson.Marshal(h.Resp.Body)
+				fmt.Println(string(all), err, h.Resp.Body == nil)
+				return
 			}
 
 			tmplType.ReqResp = append(tmplType.ReqResp, client.ReqResp{
