@@ -11,9 +11,12 @@ init:
       Org_name:  ""
       App_name: ""
       UserName: ""
+      Msg_id: ""
+      Owner_username: ""
 muilt:
 
 # 1.开放注册单个用户
+# http://docs-im-beta.easemob.com/document/server-side/account_system.html#%E5%BC%80%E6%94%BE%E6%B3%A8%E5%86%8C%E5%8D%95%E4%B8%AA%E7%94%A8%E6%88%B7
 - handler: Users.CreateUsers 
   req:
     name: CreateUsersReq
@@ -47,6 +50,7 @@ muilt:
       applicationName: XXXX
 
 # 2.授权注册单个用户
+# http://docs-im-beta.easemob.com/document/server-side/account_system.html#%E6%8E%88%E6%9D%83%E6%B3%A8%E5%86%8C%E5%8D%95%E4%B8%AA%E7%94%A8%E6%88%B7
 - handler: Users.CreateUsers2
   req:
     name: CreateUsers2Req
@@ -80,6 +84,7 @@ muilt:
       organization: XXXX
       applicationName: XXXX
 # 3.批量注册用户
+# http://docs-im-beta.easemob.com/document/server-side/account_system.html#%E6%89%B9%E9%87%8F%E6%B3%A8%E5%86%8C%E7%94%A8%E6%88%B7
 - handler: Users.CreateUsers3
   req:
     name: CreateUsers3Req
@@ -124,6 +129,7 @@ muilt:
       applicationName: XXXX
 
 # 4.获取单个用户的详情
+# http://docs-im-beta.easemob.com/document/server-side/account_system.html#%E8%8E%B7%E5%8F%96%E5%8D%95%E4%B8%AA%E7%94%A8%E6%88%B7%E7%9A%84%E8%AF%A6%E6%83%85
 - handler: Users.GetUser
   req:
     name: GetUserReq
@@ -191,4 +197,383 @@ muilt:
       duration: 11
       cursor: LTgzXXXX2tB
       count: 2
+
+
+# 6.删除单个用户
+- handler: Users.DeleteUser
+  req:
+    name: DeleteUserReq
+    url: https://{{.Host}}/{{.Org_name}}/{.App_name}/users/{{.UserName}}
+
+    method: DELETE
+    header:
+      #- 'Content-Type: application/json'
+    - 'Accept: application/json'
+    - 'Authorization:'
+    body:
+  resp:
+    name: DeleteUserResp
+    body:
+      action: delete
+      application: 8be024f0-XXXX-XXXX-b697-5d598d5f8402
+      path: "/users"
+      uri: https://XXXX/XXXX/XXXX/users
+      entities:
+      - uuid: ab90eff0-XXXX-XXXX-9174-8f161649a182
+        type: user
+        created: 1542356511855
+        modified: 1542356511855
+        username: XXXX
+        activated: true
+        nickname: user1
+      timestamp: 1542559539776
+      duration: 39
+      organization: XXXX
+      applicationName: XXXX
+
+
+# 7批量删除
+- handler: Users.DeleteUserList
+  req:
+    name: DeleteUserListReq
+    url: https://{{.Host}}/{{.Org_name}}/{.App_name}/users/{{.UserName}}
+
+    method: DELETE
+    header:
+      #- 'Content-Type: application/json'
+    - 'Accept: application/json'
+    - 'Authorization:'
+    body:
+  resp:
+    name: DeleteUserListResp
+    body:
+      action: delete
+      application: 8be024f0-XXXX-XXXX-b697-5d598d5f8402
+      params:
+        limit:
+        - '2'
+      path: "/users"
+      uri: https://XXXX/XXXX/testapp/users
+      entities:
+      - uuid: b2aade90-XXXX-XXXX-a974-f3368f82e4f1
+        type: user
+        created: 1542356523769
+        modified: 1542597334500
+        username: user2
+        activated: true
+        nickname: testuser
+      - uuid: b98ad170-XXXX-XXXX-XXXX-7f76daa76557
+        type: user
+        created: 1542356535303
+        modified: 1542356535303
+        username: user3
+        activated: true
+        nickname: user3
+      timestamp: 1542867197779
+      duration: 504
+      organization: XXXX
+      applicationName: testapp
+      cursor: LTgXXXXDNR
+
+# 8 修改用户密码
+- handler: Users.ModifyUserPassword
+  req:
+    name: ModifyUserPasswordReq
+    url: https://{{.Host}}/{{.Org_name}}/{.App_name}/users/{{.UserName}}
+
+    method: PUT
+    header:
+      #- 'Content-Type: application/json'
+    - 'Accept: application/json'
+    - 'Authorization:'
+    body:
+      newpassword: ""
+  resp:
+    name: ModifyUserPasswordResp
+    body:
+      action: set user password
+      timestamp: 1542595598924
+      duration: 8
+
+
+# 9 获取用户在线状态
+- handler: Users.GetUserStatus
+  req:
+    name: GetUserStatusReq
+    url: https://{{.Host}}/{{.Org_name}}/{.App_name}/users/{{.UserName}}/status
+
+    method: GET
+    header:
+      #- 'Content-Type: application/json'
+    - 'Accept: application/json'
+    - 'Authorization:'
+    body:
+  resp:
+    name: GetUserStatusResp
+    body:
+      action: get
+      uri: http://XXXX/XXXX/XXXX/users/user1/status
+      entities: []
+      data:
+        user1: offline
+      timestamp: 1542601284531
+      duration: 4
+      count: 0
+
+
+# 10 批量获取用户在线状态
+- handler: Users.GetUserStatusList
+  req:
+    name: GetUserStatusListReq
+    url: https://{{.Host}}/{{.Org_name}}/{.App_name}/users/batch/status
+
+    method: GET
+    header:
+      #- 'Content-Type: application/json'
+    - 'Accept: application/json'
+    - 'Authorization:'
+    body:
+  resp:
+    name: GetUserStatusListResp
+    body:
+      action: get batch user status
+      data:
+      - user1: offline
+      - user2: offline
+      timestamp: 1552280231926
+      duration: 4
+
+# 11 设置用户全局禁言
+# http://docs-im-beta.easemob.com/document/server-side/account_system.html#%E8%AE%BE%E7%BD%AE%E7%94%A8%E6%88%B7%E5%85%A8%E5%B1%80%E7%A6%81%E8%A8%80
+- handler: Users.SetGlobalMutesUsers
+  req:
+    name: SetGlobalMutesUsersReq
+    url: https://{{.Host}}/{{.Org_name}}/{.App_name}/mutes/{{.UserName}}
+
+    method: POST
+    header:
+      #- 'Content-Type: application/json'
+    - 'Accept: application/json'
+    - 'Authorization:'
+    body:
+      username: zs1
+      chat: 100
+      groupchat: 100
+      chatroom: 100
+  resp:
+    name: SetGlobalMutesUsersResp
+    body:
+      path: "/mutes"
+      uri: https://XXXX/XXXX/XXXX/mutes
+      timestamp: 1631609754727
+      organization: XXXX
+      application: 357169f0-XXXX-XXXX-9b3a-f1af649cc48d
+      action: post
+      data:
+        result: ok
+      duration: 74
+      applicationName: XXXX
+
+# 12 查询单个用户 ID 全局禁言
+- handler: Users.SetMutesUsers
+  req:
+    name: SetMutesUsersReq
+    url: https://{{.Host}}/{{.Org_name}}/{.App_name}/mutes/{{.UserName}}
+
+    method: POST
+    header:
+      #- 'Content-Type: application/json'
+    - 'Accept: application/json'
+    - 'Authorization:'
+    body:
+  resp:
+    name: SetMutesUsersResp
+    body:
+      path: "/mutes"
+      uri: https://XXXX/XXXX/XXXX/mutes
+      timestamp: 1631609831800
+      organization: XXXX
+      application: 357169f0-XXXX-XXXX-9b3a-f1af649cc48d
+      action: get
+      data:
+        userid: XXXX#restys_zs1
+        chat: 96
+        groupchat: 96
+        chatroom: 96
+        unixtime: 1631609831
+      duration: 13
+      applicationName: XXXX
+
+
+
+#
+# 13 查询 app 下的所有全局禁言的用户
+# http://docs-im-beta.easemob.com/document/server-side/account_system.html#%E6%9F%A5%E8%AF%A2-app-%E4%B8%8B%E7%9A%84%E6%89%80%E6%9C%89%E5%85%A8%E5%B1%80%E7%A6%81%E8%A8%80%E7%9A%84%E7%94%A8%E6%88%B7
+- handler: Users.SetMutesUsersAll
+  req:
+    name: SetMutesUsersAllReq
+    url: https://{{.Host}}/{{.Org_name}}/{.App_name}/mutes
+
+    method: POST
+    header:
+      #- 'Content-Type: application/json'
+    - 'Accept: application/json'
+    - 'Authorization:'
+    body:
+  resp:
+    name: SetMutesUsersAllResp
+    body:
+      path: "/mutes"
+      uri: https://XXXX/XXXX/XXXX/mutes
+      timestamp: 1631609858771
+      organization: XXXX
+      application: 357169f0-XXXX-XXXX-9b3a-f1af649cc48d
+      action: get
+      data:
+        data:
+        - username: zs2
+          chatroom: 0
+          groupchat: 69
+          chat: 69
+        - username: zs1
+          groupchat: 69
+        - username: zs1
+          chat: 69
+        - username: zs1
+          chatroom: 69
+        - username: h2
+          chatroom: 0
+        - username: h2
+          groupchat: 0
+        - username: h2
+          chat: 0
+        unixtime: 1631609858
+      duration: 17
+      applicationName: XXXX
+
+# 14 获取用户离线消息数量
+# http://docs-im-beta.easemob.com/document/server-side/account_system.html#%E8%8E%B7%E5%8F%96%E7%94%A8%E6%88%B7%E7%A6%BB%E7%BA%BF%E6%B6%88%E6%81%AF%E6%95%B0%E9%87%8F
+- handler: Users.UserOfflineMsgCount
+  req:
+    name: UserOfflineMsgCountReq
+    url: https://{{.Host}}/{{.Org_name}}/{.App_name}/users/{{.UserName}}/{{.Owner_username}}/offline_msg_count
+
+    method: GET
+    header:
+      #- 'Content-Type: application/json'
+    - 'Accept: application/json'
+    - 'Authorization:'
+    body:
+  resp:
+    name: UserOfflineMsgCountResp
+    body:
+      action: get
+      uri: http://XXXX/XXXX/XXXX/users/user1/offline_msg_count
+      entities: []
+      data: #这里要获取map[string]int
+        user1: 0
+      timestamp: 1542601518137
+      duration: 3
+      count: 0
+
+
+# 15 获取指定离线消息的投递状态
+# http://docs-im-beta.easemob.com/document/server-side/account_system.html#%E8%8E%B7%E5%8F%96%E6%8C%87%E5%AE%9A%E7%A6%BB%E7%BA%BF%E6%B6%88%E6%81%AF%E7%9A%84%E6%8A%95%E9%80%92%E7%8A%B6%E6%80%81
+- handler: Users.UserOfflineMsgStatus
+  req:
+    name: UserOfflineMsgStatusReq
+    url: https://{{.Host}}/{{.Org_name}}/{.App_name}/users/{{.UserName}}/offline_msg_status/{{.Msg_id}}
+
+    method: GET
+    header:
+      #- 'Content-Type: application/json'
+    - 'Accept: application/json'
+    - 'Authorization:'
+    body:
+  resp:
+    name: UserOfflineMsgStatusResp
+    body:
+      action: get
+      uri: http://XXXX/XXXX/XXXX/users/user1/offline_msg_status/123
+      entities: []
+      data: #这里要换成map[string]int
+        '123': delivered
+      timestamp: 1542601830084
+      duration: 5
+      count: 0
+#
+#
+# 16 账号封禁
+# http://docs-im-beta.easemob.com/document/server-side/account_system.html#%E8%B4%A6%E5%8F%B7%E5%B0%81%E7%A6%81
+- handler: Users.UserDeactivate
+  req:
+    name: UserDeactivateReq
+    url: https://{{.Host}}/{{.Org_name}}/{.App_name}/users/{{.UserName}}/deactivate
+
+    method: POST
+    header:
+      #- 'Content-Type: application/json'
+    - 'Accept: application/json'
+    - 'Authorization:'
+    body:
+  resp:
+    name: UserDeactivateResp
+    body:
+      action: Deactivate user
+      entities:
+      - uuid: 4759aa70-XXXX-XXXX-925f-6fa0510823ba
+        type: user
+        created: 1542595573399
+        modified: 1542597578147
+        username: user1
+        activated: false
+        nickname: user
+      timestamp: 1542602157258
+      duration: 12
+#
+#
+# 17 账号解禁
+# http://docs-im-beta.easemob.com/document/server-side/account_system.html#%E8%B4%A6%E5%8F%B7%E8%A7%A3%E7%A6%81
+- handler: Users.UserActivate
+  req:
+    name: UserActivateReq
+    url: https://{{.Host}}/{{.Org_name}}/{.App_name}/users/{{.UserName}}/activate
+
+    method: POST
+    header:
+      #- 'Content-Type: application/json'
+    - 'Accept: application/json'
+    - 'Authorization:'
+    body:
+  resp:
+    name: UserActivateResp
+    body:
+      action: activate user
+      timestamp: 1542602404132
+      duration: 9
+
+# 18 强制下线
+# http://docs-im-beta.easemob.com/document/server-side/account_system.html#%E5%BC%BA%E5%88%B6%E4%B8%8B%E7%BA%BF
+- handler: Users.UserDisconnect
+  req:
+    name: UserDisconnectReq
+    url: https://{{.Host}}/{{.Org_name}}/{.App_name}/users/{{.UserName}}/disconnect
+
+    method: GET
+    header:
+      #- 'Content-Type: application/json'
+    - 'Accept: application/json'
+    - 'Authorization:'
+    body:
+  resp:
+    name: UserDisconnectResp
+    body:
+      action: get
+      uri: http://XXXX/XXXX/XXXX/users/user1/disconnect
+      entities: []
+      data:
+        result: true
+      timestamp: 1542602601332
+      duration: 6
+      count: 0
 

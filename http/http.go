@@ -2,6 +2,7 @@ package http
 
 import (
 	"bytes"
+	stdjson "encoding/json"
 	"fmt"
 	"go/format"
 	"net/http"
@@ -35,6 +36,9 @@ type HTTP struct {
 
 func getBody(name string, bodyData any) (body client.Body, err error) {
 
+	if bodyData == nil {
+		return
+	}
 	body.Name = name + "Body"
 
 	var data []byte
@@ -149,10 +153,16 @@ func (h *HTTP) SubMain() {
 				return
 			}
 
-			respBody, err := getBody(h.Resp.Name, h.Resp.Body)
-			if err != nil {
-				fmt.Printf("get response body:%s\n", err)
-				return
+			var respBody client.Body
+			if h.Resp.Body != nil {
+
+				respBody, err = getBody(h.Resp.Name, h.Resp.Body)
+				if err != nil {
+					fmt.Printf("get response body:%s\n", err)
+					all, err := stdjson.Marshal(h.Req.Body)
+					fmt.Println(string(all), err, h.Req.Body == nil)
+					return
+				}
 			}
 
 			tmplType.ReqResp = append(tmplType.ReqResp, client.ReqResp{
