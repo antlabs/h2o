@@ -11,7 +11,7 @@ package {{.PackageName}}
 
   {{range $value := .ReqResp}}
     type {{$value.Req.Name}} struct {
-      {{if $value.Req.Query.Name}} Query {{$value.Req.QueryName}} {{end}}
+      {{if $value.Req.Query.Name}} Query {{$value.Req.Query.Name}} {{end}}
       {{if $value.Req.Body.Name }} Body {{$value.Req.Body.Name}} {{end}}
       {{if $value.Req.Header.Name}} Header {{$value.Req.Header.Name}} {{end}}
     }

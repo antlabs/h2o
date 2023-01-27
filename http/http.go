@@ -14,6 +14,7 @@ import (
 	"github.com/antlabs/tostruct/header"
 	"github.com/antlabs/tostruct/json"
 	"github.com/antlabs/tostruct/option"
+	"github.com/antlabs/tostruct/url"
 )
 
 // 生成客户端代码
@@ -115,15 +116,19 @@ func (h *HTTP) SubMain() {
 
 			var query client.Query
 			if len(h.Req.URL) > 0 {
-				/*
-					query.Name = h.Req.Name + "Query"
-					all, err := url.Marshal(h.Req.URL, option.WithStructName(query.Name), option.WithTagName("query"))
-					query.StructType = all
+				query.Name = h.Req.Name + "Query"
+				if pos := strings.Index(h.Req.URL, "?"); pos != -1 {
+					// dst.yaml里面的字符串带{}两种花括号。直接使用解析这样的url会报错。给个默认正确的host，就可以得到query string
+					urlStr := "www.qq.com?" + h.Req.URL[pos+1:]
+					all, err := url.Marshal(urlStr, option.WithStructName(query.Name), option.WithTagName("query"))
+					query.StructType = string(all)
 					if err != nil {
 						fmt.Printf("marshal query string fail:%s\n", err)
 						return
 					}
-				*/
+				} else {
+					query.Name = ""
+				}
 			}
 
 			reqHeader, err := getHeader(h.Req.Name+"Header", h.Req.Header)
@@ -171,6 +176,7 @@ func (h *HTTP) SubMain() {
 				URL:         h.Req.URL,
 				ReqName:     h.Req.Name,
 				RespName:    h.Resp.Name,
+				HaveQuery:   len(query.StructType) > 0,
 				HaveHeader:  len(h.Req.Header) > 0,
 				HaveReqBody: h.Req.Body != nil,
 			})
@@ -203,6 +209,7 @@ func (h *HTTP) SubMain() {
 			fmtType, err := format.Source(typeBuf.Bytes())
 			if err != nil {
 				fmt.Printf("fmt type fail:%s\n", err)
+				os.Stdout.Write(typeBuf.Bytes())
 				return
 			}
 
