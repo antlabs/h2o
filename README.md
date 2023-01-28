@@ -3,7 +3,7 @@
 
 ## Install
 ```bash
-go install github.com/antlabs/h2o/tree/master/cmd/h2o@latest
+go install github.com/antlabs/h2o/cmd/h2o@latest
 ```
 
 ## json 子命令
