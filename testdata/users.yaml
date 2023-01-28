@@ -296,7 +296,7 @@ muilt:
       duration: 8
 
 
-# 9 获取用户在线状态
+# 9 获取单个用户在线状态
 - handler: Users.GetUserStatus
   req:
     name: GetUserStatusReq
@@ -310,6 +310,8 @@ muilt:
     body:
   resp:
     name: GetUserStatusResp
+    newType:
+      .data: map[string]string
     body:
       action: get
       uri: http://XXXX/XXXX/XXXX/users/user1/status
@@ -335,6 +337,8 @@ muilt:
     body:
   resp:
     name: GetUserStatusListResp
+    newType:
+      .data: "[]map[string]string"
     body:
       action: get batch user status
       data:
@@ -466,6 +470,8 @@ muilt:
     body:
   resp:
     name: UserOfflineMsgCountResp
+    newType:
+      .data: map[string]int
     body:
       action: get
       uri: http://XXXX/XXXX/XXXX/users/user1/offline_msg_count

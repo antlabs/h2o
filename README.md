@@ -9,15 +9,15 @@ go install github.com/antlabs/h2o/tree/master/cmd/h2o@latest
 ## json 子命令
 ```bash
 # 从json文件中生成结构体, -n 选项表示分拆
-h2o json -f ./test.yaml -n
-# 从stdin生成结构体
-h2o json -f -
+h2o jsonstruct -f ./test.yaml -n
+# 从stdin生成结构体, 按ctrl+d 结束
+h2o jsonstruct -f -
 ```
 ## yaml 子命令
 ```bash
 # 从json文件中生成结构体， -n 选项表示分拆
-h2o yaml -f ./test.yaml -n
-h2o yaml -f -
+h2o yamlstruct -f ./test.yaml -n
+h2o yamlstruct -f -
 ```
 ## codemsg 子命令
 只要实现code，自动生成String()类型和CodeMsg类型。可以在错误码代码节约时间  

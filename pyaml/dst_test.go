@@ -9,7 +9,7 @@ import (
 
 func Test_Parse(t *testing.T) {
 
-	p, err := Parse("../testdata/dst.yaml")
+	p, err := Parse("../testdata/users.yaml")
 	assert.NoError(t, err)
 
 	for _, d := range p.Muilt {

@@ -1,0 +1,239 @@
+---
+package: "contacts"
+init:
+  handler: New #函数名, 名字是New认识是构造函数
+  #req:
+    #field:   #TODO
+  resp:
+    name: Contacts #返回的结构体名
+    field:
+      Host: www.xxx.com
+      Org_name:  ""
+      App_name: ""
+      UserName: ""
+      Msg_id: ""
+      Owner_username: ""
+      Friend_username: ""
+      Blocked_username: ""
+muilt:
+
+# 1.添加好友
+# http://docs-im-beta.easemob.com/document/server-side/user_relationship.html#%E6%B7%BB%E5%8A%A0%E5%A5%BD%E5%8F%8B
+- handler: Users.AddFriend
+  req:
+    name: AddFriendReq
+    method: POST
+    url: https://{{.Host}}/{{.Org_name}}/{{.App_name}}/users/{{.Owner_username}}/contacts/users/{{.Friend_username}}
+
+    # 直接使用配置文件里面的值
+    useDefault:
+      header:
+      - Content-Type
+      - Accept
+
+    header:
+    - 'Authorization: '
+    - 'Content-Type: application/json'
+    - 'Accept: application/json'
+    body:
+  resp:
+    name: AddFriendResp
+    body:
+      action: post
+      application: 8bXXXX402
+      path: "/users/475XXXXba/contacts"
+      uri: https://XXXX/XXXX/XXXX/users/475XXXXba/contacts
+      entities:
+      - uuid: b2aXXXXf1
+        type: user
+        created: 1542356523769
+        modified: 1542597334500
+        username: user2
+        activated: true
+        nickname: testuser
+      timestamp: 1542598913819
+      duration: 63
+      organization: XXXX
+      applicationName: testapp
+
+
+# 2.移除好友
+# http://docs-im-beta.easemob.com/document/server-side/user_relationship.html#%E7%A7%BB%E9%99%A4%E5%A5%BD%E5%8F%8B
+- handler: Users.DelFriend
+  req:
+    name: DelFriendReq
+    method: DELETE
+    url: https://{{.Host}}/{{.Org_name}}/{{.App_name}}/users/{{.Owner_username}}/contacts/users/{{.Friend_username}}
+
+    # 直接使用配置文件里面的值
+    useDefault:
+      header:
+      - Content-Type
+      - Accept
+
+    header:
+    - 'Authorization: '
+    - 'Content-Type: application/json'
+    - 'Accept: application/json'
+    body:
+  resp:
+    name: DelFriendResp
+    body:
+      action: delete
+      application: 8bXXXX402
+      path: "/users/475XXXXba/contacts"
+      uri: https://XXXX/XXXX/XXXX/users/475XXXXba/contacts
+      entities:
+      - uuid: b2aXXXXf1
+        type: user
+        created: 1542356523769
+        modified: 1542597334500
+        username: user2
+        activated: true
+        nickname: testuser
+      timestamp: 1542599266616
+      duration: 350
+      organization: XXXX
+      applicationName: testapp
+
+
+# 3. 获取好友列表
+# http://docs-im-beta.easemob.com/document/server-side/user_relationship.html#%E8%8E%B7%E5%8F%96%E5%A5%BD%E5%8F%8B%E5%88%97%E8%A1%A8
+- handler: Users.GetFriendList
+  req:
+    name: GetFriendListReq
+    method: POST
+    url: https://{{.Host}}/{{.Org_name}}/{{.App_name}}/users/{{.Owner_username}}/blocks/users/
+
+    # 直接使用配置文件里面的值
+    useDefault:
+      header:
+      - Content-Type
+      - Accept
+
+    header:
+    - 'Authorization: '
+    - 'Content-Type: application/json'
+    - 'Accept: application/json'
+    body:
+      usernames:
+      - user2
+  resp:
+    name: GetFriendListResp
+    body:
+      action: get
+      uri: http://XXXX/XXXX/XXXX/users/user1/contacts/users
+      entities: []
+      data:
+      - user3
+      - user2
+      timestamp: 1543819826513
+      duration: 12
+      count: 2
+#
+#
+# 4.添加用户至黑名单
+# http://docs-im-beta.easemob.com/document/server-side/user_relationship.html#%E6%B7%BB%E5%8A%A0%E7%94%A8%E6%88%B7%E8%87%B3%E9%BB%91%E5%90%8D%E5%8D%95
+- handler: Users.AddBlockedUser
+  req:
+    name: AddBlockedUserReq
+    method: POST
+    url: https://{{.Host}}/{{.Org_name}}/{{.App_name}}/users/{{.Owner_username}}/blocks/users/
+
+    # 直接使用配置文件里面的值
+    useDefault:
+      header:
+      - Content-Type
+      - Accept
+
+    header:
+    - 'Authorization: '
+    - 'Content-Type: application/json'
+    - 'Accept: application/json'
+    body:
+      usernames:
+      - user2
+  resp:
+    name: AddBlockedUserResp
+    body:
+      action: post
+      application: 8bXXXX402
+      uri: https://XXXX.com/XXXX/testapp
+      entities: []
+      data:
+      - user2
+      timestamp: 1542600372046
+      duration: 11
+      organization: XXXX
+      applicationName: testapp
+#
+#
+#
+# 5. 获取黑名单用户
+# http://docs-im-beta.easemob.com/document/server-side/user_relationship.html#%E8%8E%B7%E5%8F%96%E9%BB%91%E5%90%8D%E5%8D%95%E5%88%97%E8%A1%A8
+- handler: Users.GetBlockedUserList
+  req:
+    name: GetBlockedUserListReq
+    method: GET
+    url: https://{{.Host}}/{{.Org_name}}/{{.App_name}}/users/{{.Owner_username}}/blocks/users/
+    # 直接使用配置文件里面的值
+    useDefault:
+      header:
+      - Content-Type
+      - Accept
+
+    header:
+    - 'Authorization: '
+    - 'Content-Type: application/json'
+    - 'Accept: application/json'
+    body:
+  resp:
+    name: GetBlockedUserListResp
+    body:
+      action: get
+      uri: http://XXXX/XXXX/XXXX/users/user1/blocks/users
+      entities: []
+      data:
+      - user2
+      timestamp: 1542599978751
+      duration: 4
+      count: 1
+#
+# 6. 从黑名单用户移除用户
+- handler: Users.DelBlockedUser
+  req:
+    name: DelBlockedUserReq
+    method: DELETE
+    url: https://{{.Host}}/{{.Org_name}}/{{.App_name}}/users/{{.Owner_username}}/blocks/users/{{.Blocked_username}}
+
+
+    # 直接使用配置文件里面的值
+    useDefault:
+      header:
+      - Content-Type
+      - Accept
+
+    header:
+    - 'Authorization: '
+    - 'Content-Type: application/json'
+    - 'Accept: application/json'
+    body:
+  resp:
+    name: DelBlockedUserResp
+    body:
+      action: delete
+      application: 8bXXXX402
+      path: "/users/475XXXXba/blocks"
+      uri: https://XXXX/XXXX/XXXX/users/475XXXXba/blocks
+      entities:
+      - uuid: b2aXXXXf1
+        type: user
+        created: 1542356523769
+        modified: 1542597334500
+        username: user2
+        activated: true
+        nickname: testuser
+      timestamp: 1542600712985
+      duration: 20
+      organization: XXXX
+      applicationName: testapp
