@@ -1,0 +1,48 @@
+---
+package: "usertoken"
+init:
+  handler: New #函数名, 名字是New认识是构造函数
+  #req:
+    #field:   #TODO
+  resp:
+    name: UserToken #返回的结构体名
+    field:
+      Host: www.xxx.com
+      Org_name:  ""
+      App_name: ""
+
+muilt:
+- handler: UserToken.CreateUserToken
+  req:
+    method: POST
+    url: https://{{.Host}}/{{.Org_name}}/{{.App_name}}/token
+    # 直接使用配置文件里面的值
+    useDefault:
+      header:
+      - Content-Type
+      - Accept
+      body:
+        .grant_type
+    header:
+    - 'Content-Type: application/json'
+    - 'Accept: application/json'
+    encode: 
+      body:
+    body:
+      grant_type: client_credentials
+      client_id: YXA6i-Ak8Ol4Eei2l11ZjV-EAg
+      client_secret: YXA6VunqiNxoB7IwXHInk1cGiXOOJfc
+      ttl: '1024000'
+
+  resp:
+    newType:
+    body:
+      access_token: YWMtrR6ECkz8Eeyx6Y9j1eX9kbsMrFep3U6BvVj7KSnNonWqRx7gTPwR7Kzl-Q_xISNOAwMAAAF9UPZqbQAPoAAtYK9fWgaTNyuWoB3-6nGf_TXBx3Nt3XRZST-elU0x2A
+      expires_in: 1024000
+      user:
+        uuid: aa471ee0-XXXX-XXXX-ace5-f90ff121234e
+        type: user
+        created: 1637740861395
+        modified: 1637740861395
+        username: c
+        activated: true

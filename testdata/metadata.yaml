@@ -1,0 +1,168 @@
+---
+package: "metadata"
+init:
+  handler: New #函数名, New是构造函数
+  #req:
+    #field:   #TODO
+  resp:
+    name: Metadata #返回的结构体名
+    field:
+      Host: www.xxx.com
+      Org_name:  ""
+      App_name: ""
+      UserName: ""
+      Msg_id: ""
+      Owner_username: ""
+muilt:
+# 1. 设置用户属性
+# http://docs-im-beta.easemob.com/document/server-side/userprofile.html#%E8%AE%BE%E7%BD%AE%E7%94%A8%E6%88%B7%E5%B1%9E%E6%80%A7
+- handler: Users.CreateUserMetadata
+  req:
+    name: CreateUserMetadataReq
+    method: POST
+    url: https://{{.Host}}/{{.Org_name}}/{{.App_name}}/metadata/user/{{.UserName}}
+    # 直接使用配置文件里面的值
+    useDefault:
+      header:
+      - Content-Type
+      - Accept
+    header:
+    - 'Authorization: auth'
+    - 'Content-Type: application/json'
+    - 'Accept: application/json'
+    encode: 
+      body: www-form #默认json
+    body:
+      username: user1
+      password: '123'
+      nickname: testuser
+  resp:
+    name: CreateUserMetadataResp
+    newType:
+      .data: map[string]interface{}
+    body:
+      timestamp: 1620445147011
+      data:
+        ext: ext
+        nickname: nickname
+        avatarurl: http://www.easemob.com/avatar.png
+      duration: 166
+
+
+# 2. 获取用户属性
+# http://docs-im-beta.easemob.com/document/server-side/userprofile.html#%E8%8E%B7%E5%8F%96%E7%94%A8%E6%88%B7%E5%B1%9E%E6%80%A7
+- handler: Users.GetUserMetadata
+  req:
+    #name: CreateUsersReq
+    method: GET
+    url: https://{{.Host}}/{{.Org_name}}/{{.App_name}}/metadata/user/{{.UserName}}
+    # 直接使用配置文件里面的值
+    useDefault:
+      header:
+      - Content-Type
+      - Accept
+    header:
+    - 'Content-Type: application/json'
+    - 'Accept: application/json'
+    - 'Authorization: auth'
+    body:
+  resp:
+    # name: CreateUsersResp
+    newType:
+      .data: map[string]interface{}
+    body:
+      timestamp: 1620445147011
+      data:
+        ext: ext
+        nickname: nickname
+        avatarurl: http://www.easemob.com/avatar.png
+      duration: 166
+
+# 3. 批量获取用户属性
+# http://docs-im-beta.easemob.com/document/server-side/userprofile.html#%E6%89%B9%E9%87%8F%E8%8E%B7%E5%8F%96%E7%94%A8%E6%88%B7%E5%B1%9E%E6%80%A7
+- handler: Users.GetUserMetadataList
+  req:
+    #name: CreateUsersReq
+    method: POST
+    url: https://{{.Host}}/{{.Org_name}}/{{.App_name}}/metadata/user/get
+    # 直接使用配置文件里面的值
+    useDefault:
+      header:
+      - Content-Type
+      - Accept
+    header:
+    - 'Content-Type: application/json'
+    - 'Accept: application/json'
+    - 'Authorization: str'
+    body:
+      properties:
+      - avatarurl
+      - ext
+      - nickname
+      targets:
+      - user1
+      - user2
+      - user3
+  resp:
+    # name: CreateUsersResp
+    newType:
+      .data: map[string]map[string]interface{}
+    body:
+      timestamp: 1620448826647
+      data:
+        user1:
+          ext: ext
+          nickname: nickname
+          avatarurl: http://www.easemob.com/avatar.png
+        user2:
+          ext: ext
+          nickname: nickname
+          avatarurl: http://www.easemob.com/avatar.png
+        user3:
+          ext: ext
+          nickname: nickname
+          avatarurl: http://www.easemob.com/avatar.png
+      duration: 3
+
+# 4.获取 app 下用户属性总大小
+# http://docs-im-beta.easemob.com/document/server-side/userprofile.html#%E8%8E%B7%E5%8F%96-app-%E4%B8%8B%E7%94%A8%E6%88%B7%E5%B1%9E%E6%80%A7%E6%80%BB%E5%A4%A7%E5%B0%8F
+- handler: Users.GetUserMetadataCount
+  req:
+    #name: CreateUsersReq
+    method: GET
+    url: https://{{.Host}}/{{.Org_name}}/{{.App_name}}/metadata/user/capacity
+    # 直接使用配置文件里面的值
+    useDefault:
+      header:
+    header:
+    - 'Authorization: auth'
+    body:
+  resp:
+    # name: CreateUsersResp
+    newType:
+      .data: map[string]map[string]interface{}
+    body:
+      timestamp: 1620447051368
+      data: 1673
+      duration: 55
+
+# 5. 删除用户属性
+# http://docs-im-beta.easemob.com/document/server-side/userprofile.html#%E5%88%A0%E9%99%A4%E7%94%A8%E6%88%B7%E5%B1%9E%E6%80%A7
+- handler: Users.DeleteUserMetadata
+  req:
+    #name: CreateUsersReq
+    method: DELETE
+    url: https://{{.Host}}/{{.Org_name}}/{{.App_name}}/metadata/user/{{.UserName}}
+    # 直接使用配置文件里面的值
+    useDefault:
+      header:
+    header:
+    - 'Authorization: auth'
+    body:
+  resp:
+    # name: CreateUsersResp
+    newType:
+    body:
+      timestamp: 1620447051368
+      duration: 10
+      data: true

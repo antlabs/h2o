@@ -16,7 +16,6 @@ init:
       Friend_username: ""
       Blocked_username: ""
 muilt:
-
 # 1.添加好友
 # http://docs-im-beta.easemob.com/document/server-side/user_relationship.html#%E6%B7%BB%E5%8A%A0%E5%A5%BD%E5%8F%8B
 - handler: Users.AddFriend

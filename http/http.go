@@ -36,29 +36,50 @@ type HTTP struct {
 	Dir  string   `clop:"short;long" usage:"gen dir" default:"."`
 }
 
-func getBody(name string, bodyData any, newType map[string]string) (body client.Body, err error) {
+func getBody(bodyName string, bodyData any, newType map[string]string, encode model.Encode, bodyDefKey []string) (
+	body client.Body,
+	rvDefaultBody []model.KeyVal[string, string],
+	err error) {
 
-	if bodyData == nil {
-		//return
+	body.Name = bodyName + "Body"
+
+	tagName := "json"
+	if encode.Body == model.WWWForm {
+		tagName = "form"
 	}
 
-	body.Name = name + "Body"
+	getVal := make(map[string]string)
+
+	for _, v := range bodyDefKey {
+		getVal[v] = ""
+	}
 
 	var data []byte
 	switch v := bodyData.(type) {
 	case map[string]any:
-		data, err = json.Marshal(v, option.WithStructName(body.Name), option.WithTagName("json"), option.WithSpecifyType(newType))
+		data, err = json.Marshal(v, option.WithStructName(body.Name), option.WithTagName(tagName), option.WithSpecifyType(newType), option.WithGetValue(getVal))
 	case []any:
-		data, err = json.Marshal(v, option.WithStructName(body.Name), option.WithTagName("json"), option.WithSpecifyType(newType))
+		data, err = json.Marshal(v, option.WithStructName(body.Name), option.WithTagName(tagName), option.WithSpecifyType(newType), option.WithGetValue(getVal))
 	default:
 		body.Name = ""
+	}
+
+	if len(getVal) > 0 {
+		rvDefaultBody = make([]model.KeyVal[string, string], 0, len(getVal))
+		for k, v := range getVal {
+			fieldName, _ := name.GetFieldAndTagName(k)
+			rvDefaultBody = append(rvDefaultBody, model.KeyVal[string, string]{Key: fieldName, Val: v})
+		}
 	}
 
 	body.StructType = string(data)
 	return
 }
 
-func getHeader(headerName string, headerArray []string, defaultHeader []string) (htmpl client.Header, rvDefaultHeader []model.KeyVal[string, string], err error) {
+func getHeader(headerName string, headerArray []string, defaultHeader []string) (
+	htmpl client.Header,
+	rvDefaultHeader []model.KeyVal[string, string],
+	err error) {
 
 	// http header
 	if len(headerArray) == 0 {
@@ -100,7 +121,9 @@ func getHeader(headerName string, headerArray []string, defaultHeader []string) 
 	}
 
 	var data []byte
-	data, err = header.Marshal(hmap, option.WithStructName(htmpl.Name), option.WithTagName("header"), option.WithTagNameFromKey())
+	data, err = header.Marshal(hmap, option.WithStructName(htmpl.Name),
+		//option.WithOutputFmtBefore(),
+		option.WithTagName("header"), option.WithTagNameFromKey())
 	if err != nil {
 		return
 	}
@@ -126,7 +149,7 @@ func (h *HTTP) SubMain() {
 
 		c, err := parser.Parser(f)
 		if err != nil {
-			fmt.Printf("http.parser %s\n", err)
+			fmt.Printf("h2o.HTTP.parser %s\n", err)
 			return
 		}
 
@@ -141,8 +164,21 @@ func (h *HTTP) SubMain() {
 		for _, h := range c.Muilt {
 
 			handler := h.Handler
+			// 去除前面的包名, TODO 没有如果点就是普通函数
 			if pos := strings.Index(handler, "."); pos != -1 {
 				handler = handler[pos+1:]
+			}
+
+			if handler == "" {
+				panic("handler name is empty")
+			}
+
+			if h.Req.Name == "" {
+				h.Req.Name = handler + "Req"
+			}
+
+			if h.Resp.Name == "" {
+				h.Resp.Name = handler + "Resp"
 			}
 
 			var query client.Query
@@ -165,7 +201,7 @@ func (h *HTTP) SubMain() {
 
 			reqHeader, defReqHeader, err := getHeader(h.Req.Name+"Header", h.Req.Header, h.Req.UseDefault.Header)
 			if err != nil {
-				fmt.Printf("get request header:%s\n", err)
+				fmt.Printf("get request header:%s, %v\n", err, h.Req.Header)
 				return
 			}
 
@@ -175,13 +211,13 @@ func (h *HTTP) SubMain() {
 				return
 			}
 
-			reqBody, err := getBody(h.Req.Name, h.Req.Body, h.Req.NewType)
+			reqBody, defReqBody, err := getBody(h.Req.Name, h.Req.Body, h.Req.NewType, h.Req.Encode, h.Req.UseDefault.Body)
 			if err != nil {
 				fmt.Printf("get request body:%s\n", err)
 				return
 			}
 
-			respBody, err := getBody(h.Resp.Name, h.Resp.Body, h.Resp.NewType)
+			respBody, _, err := getBody(h.Resp.Name, h.Resp.Body, h.Resp.NewType, model.Encode{}, nil)
 			if err != nil {
 				fmt.Printf("get response body:%s \n", err)
 				all, _ := stdjson.Marshal(h.Resp.Body)
@@ -211,6 +247,8 @@ func (h *HTTP) SubMain() {
 				ReqName:      h.Req.Name,
 				RespName:     h.Resp.Name,
 				DefReqHeader: defReqHeader,
+				DefReqBody:   defReqBody,
+				ReqWWWForm:   h.Req.Encode.Body == model.WWWForm,
 				HaveQuery:    len(query.StructType) > 0,
 				HaveHeader:   len(h.Req.Header) > 0,
 				HaveReqBody:  h.Req.Body != nil,
@@ -234,6 +272,8 @@ func (h *HTTP) SubMain() {
 			}
 
 			os.WriteFile(funcFileName, fmtType, 0644)
+		} else {
+			fmt.Printf("%s 已经存在，忽略\n", funcFileName)
 		}
 
 		typeFileName := dir + "/" + tmplClient.PackageName + "_type.go"

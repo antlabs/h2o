@@ -53,12 +53,20 @@ func ({{$ReceiverName}} *{{$StructName}}) {{$value.HandlerName}}({{if $value.Req
   req.Header.{{$val.Key}} = {{$val.Val|printf "%q"}}
   {{- end}}
 
+  {{- range $_, $val := .DefReqBody}}
+  req.Body.{{$val.Key}} = {{$val.Val|printf "%q"}}
+  {{- end}}
+
   code := 0
   err := gout.{{.Method}}({{$value.URL|printf "%q"}}, *{{$ReceiverName}}){{if .HaveHeader}}.
   SetHeader(req.Header)
   {{- end}}{{- if .HaveQuery}}.
   SetQuery(req.Query){{end}}{{if .HaveReqBody}}.
-  SetJSON(req.Body){{end}}.
+  {{- if .ReqWWWForm}}
+  SetWWWForm(req.Body)
+  {{- else}}
+  SetJSON(req.Body)
+  {{- end}}{{end}}.
   BindJSON(&resp.Body).
   Code(&code).
   Do()
@@ -87,9 +95,11 @@ type Func struct {
 	URL          string //url 地址
 	Method       string //http方法 GET POST DELETE之类的
 	DefReqHeader []model.KeyVal[string, string]
+	DefReqBody   []model.KeyVal[string, string]
 	HaveHeader   bool   //有http header
 	HaveQuery    bool   //有查询字符串
 	HaveReqBody  bool   //有请求body
+	ReqWWWForm   bool   //www form 编码
 	ReqName      string //函数请求参数名
 	RespName     string //函数响应参数名
 	HandlerName  string //生成的函数名

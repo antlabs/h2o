@@ -29,9 +29,15 @@ type Muilt struct {
 
 type UseDefault struct {
 	Header []string `yaml:"header"`
+	Body   []string `yaml:"body"`
+}
+
+type Encode struct {
+	Body string `yaml:"body"`
 }
 
 type Req struct {
+	Encode     Encode            `yaml:"encode"`
 	URL        string            `yaml:"url"`
 	Name       string            `yaml:"name"`
 	NewType    map[string]string `yaml:"newType"`

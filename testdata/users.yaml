@@ -22,6 +22,11 @@ muilt:
     name: CreateUsersReq
     method: POST
     url: https://{{.Host}}/{{.Org_name}}/{{.App_name}}/users
+    # 直接使用配置文件里面的值
+    useDefault:
+      header:
+      - Content-Type
+      - Accept
     header:
     - 'Content-Type: application/json'
     - 'Accept: application/json'
@@ -56,10 +61,14 @@ muilt:
     name: CreateUsers2Req
     url: https://{host}/{org_name}/{app_name}/users
     method: POST
+    useDefault:
+      header:
+      - Content-Type
+      - Accept
     header:
     - 'Content-Type: application/json'
     - 'Accept: application/json'
-    - 'Authorization:'
+    - 'Authorization: auth'
     body:
       - username: user1
         password: '123'
@@ -90,9 +99,13 @@ muilt:
     name: CreateUsers3Req
     url: https://{host}/{org_name}/{app_name}/users
     method: POST
+    useDefault:
+      header:
+      - Content-Type
+      - Accept
     header:
     - 'Content-Type: application/json'
-    - 'Authorization:'
+    - 'Authorization: auth'
     body:
       - username: user1
         password: '123'
@@ -135,9 +148,13 @@ muilt:
     name: GetUserReq
     url: https://{{.Host}}/{{.Org_name}}/{{.App_name}}/users/{{.UserName}}
     method: GET
+    useDefault:
+      header:
+      - Content-Type
+      - Accept
     header:
     - 'Content-Type: application/json'
-    - 'Authorization:'
+    - 'Authorization: auth'
     body:
   resp:
     name: GetUserResp
@@ -164,10 +181,14 @@ muilt:
     url: https://{{.Host}}/{{.Org_name}}/{.App_name}/users?limit=2&cursor=LTgzXXXXtB
 
     method: GET
+    useDefault:
+      header:
+      - Content-Type
+      - Accept
     header:
       #- 'Content-Type: application/json'
     - 'Accept: application/json'
-    - 'Authorization:'
+    - 'Authorization: auth'
     body:
   resp:
     name: GetUserListResp
@@ -206,10 +227,14 @@ muilt:
     url: https://{{.Host}}/{{.Org_name}}/{.App_name}/users/{{.UserName}}
 
     method: DELETE
+    useDefault:
+      header:
+      - Content-Type
+      - Accept
     header:
       #- 'Content-Type: application/json'
     - 'Accept: application/json'
-    - 'Authorization:'
+    - 'Authorization: auth'
     body:
   resp:
     name: DeleteUserResp
@@ -239,10 +264,14 @@ muilt:
     url: https://{{.Host}}/{{.Org_name}}/{.App_name}/users/{{.UserName}}
 
     method: DELETE
+    useDefault:
+      header:
+      - Content-Type
+      - Accept
     header:
       #- 'Content-Type: application/json'
     - 'Accept: application/json'
-    - 'Authorization:'
+    - 'Authorization: auth'
     body:
   resp:
     name: DeleteUserListResp
@@ -282,10 +311,14 @@ muilt:
     url: https://{{.Host}}/{{.Org_name}}/{.App_name}/users/{{.UserName}}
 
     method: PUT
+    useDefault:
+      header:
+      - Content-Type
+      - Accept
     header:
       #- 'Content-Type: application/json'
     - 'Accept: application/json'
-    - 'Authorization:'
+    - 'Authorization: auth'
     body:
       newpassword: ""
   resp:
@@ -303,10 +336,14 @@ muilt:
     url: https://{{.Host}}/{{.Org_name}}/{.App_name}/users/{{.UserName}}/status
 
     method: GET
+    useDefault:
+      header:
+      - Content-Type
+      - Accept
     header:
       #- 'Content-Type: application/json'
     - 'Accept: application/json'
-    - 'Authorization:'
+    - 'Authorization: auth'
     body:
   resp:
     name: GetUserStatusResp
@@ -330,10 +367,14 @@ muilt:
     url: https://{{.Host}}/{{.Org_name}}/{.App_name}/users/batch/status
 
     method: GET
+    useDefault:
+      header:
+      - Content-Type
+      - Accept
     header:
       #- 'Content-Type: application/json'
     - 'Accept: application/json'
-    - 'Authorization:'
+    - 'Authorization: auth'
     body:
   resp:
     name: GetUserStatusListResp
@@ -355,10 +396,14 @@ muilt:
     url: https://{{.Host}}/{{.Org_name}}/{.App_name}/mutes/{{.UserName}}
 
     method: POST
+    useDefault:
+      header:
+      - Content-Type
+      - Accept
     header:
       #- 'Content-Type: application/json'
     - 'Accept: application/json'
-    - 'Authorization:'
+    - 'Authorization: auth'
     body:
       username: zs1
       chat: 100
@@ -385,10 +430,14 @@ muilt:
     url: https://{{.Host}}/{{.Org_name}}/{.App_name}/mutes/{{.UserName}}
 
     method: POST
+    useDefault:
+      header:
+      - Content-Type
+      - Accept
     header:
       #- 'Content-Type: application/json'
     - 'Accept: application/json'
-    - 'Authorization:'
+    - 'Authorization: auth'
     body:
   resp:
     name: SetMutesUsersResp
@@ -419,10 +468,14 @@ muilt:
     url: https://{{.Host}}/{{.Org_name}}/{.App_name}/mutes
 
     method: POST
+    useDefault:
+      header:
+      - Content-Type
+      - Accept
     header:
       #- 'Content-Type: application/json'
     - 'Accept: application/json'
-    - 'Authorization:'
+    - 'Authorization: auth'
     body:
   resp:
     name: SetMutesUsersAllResp
@@ -463,10 +516,14 @@ muilt:
     url: https://{{.Host}}/{{.Org_name}}/{.App_name}/users/{{.UserName}}/{{.Owner_username}}/offline_msg_count
 
     method: GET
+    useDefault:
+      header:
+      - Content-Type
+      - Accept
     header:
       #- 'Content-Type: application/json'
     - 'Accept: application/json'
-    - 'Authorization:'
+    - 'Authorization: auth'
     body:
   resp:
     name: UserOfflineMsgCountResp
@@ -491,10 +548,14 @@ muilt:
     url: https://{{.Host}}/{{.Org_name}}/{.App_name}/users/{{.UserName}}/offline_msg_status/{{.Msg_id}}
 
     method: GET
+    useDefault:
+      header:
+      - Content-Type
+      - Accept
     header:
       #- 'Content-Type: application/json'
     - 'Accept: application/json'
-    - 'Authorization:'
+    - 'Authorization: auth'
     body:
   resp:
     name: UserOfflineMsgStatusResp
@@ -519,10 +580,14 @@ muilt:
     url: https://{{.Host}}/{{.Org_name}}/{.App_name}/users/{{.UserName}}/deactivate
 
     method: POST
+    useDefault:
+      header:
+      - Content-Type
+      - Accept
     header:
       #- 'Content-Type: application/json'
     - 'Accept: application/json'
-    - 'Authorization:'
+    - 'Authorization: auth'
     body:
   resp:
     name: UserDeactivateResp
@@ -548,10 +613,14 @@ muilt:
     url: https://{{.Host}}/{{.Org_name}}/{.App_name}/users/{{.UserName}}/activate
 
     method: POST
+    useDefault:
+      header:
+      - Content-Type
+      - Accept
     header:
       #- 'Content-Type: application/json'
     - 'Accept: application/json'
-    - 'Authorization:'
+    - 'Authorization: auth'
     body:
   resp:
     name: UserActivateResp
@@ -568,10 +637,14 @@ muilt:
     url: https://{{.Host}}/{{.Org_name}}/{.App_name}/users/{{.UserName}}/disconnect
 
     method: GET
+    useDefault:
+      header:
+      - Content-Type
+      - Accept
     header:
       #- 'Content-Type: application/json'
     - 'Accept: application/json'
-    - 'Authorization:'
+    - 'Authorization: auth'
     body:
   resp:
     name: UserDisconnectResp
