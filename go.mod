@@ -4,10 +4,11 @@ go 1.19
 
 require (
 	github.com/antlabs/deepcopy v0.0.6
-	github.com/antlabs/tostruct v0.0.1
+	github.com/antlabs/tostruct v0.0.4
 	github.com/guonaihong/clop v0.2.9
 	github.com/stretchr/testify v1.8.1
 	golang.org/x/tools v0.5.0
+	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
@@ -24,5 +25,4 @@ require (
 	golang.org/x/mod v0.7.0 // indirect
 	golang.org/x/sys v0.4.0 // indirect
 	golang.org/x/text v0.3.7 // indirect
-	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
