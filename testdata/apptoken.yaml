@@ -22,7 +22,7 @@ muilt:
       - Content-Type
       - Accept
       body:
-      - .grant_type
+        # - .grant_type
     header:
     - 'Content-Type: application/json'
     - 'Accept: application/json'

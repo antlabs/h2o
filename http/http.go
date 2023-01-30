@@ -259,37 +259,53 @@ func (h *HTTP) SubMain() {
 		dir = path.Clean(dir)
 		os.MkdirAll(dir, 0755)
 
-		funcFileName := dir + "/" + tmplClient.PackageName + ".go"
-		if b, _ := exists(funcFileName); !b {
+		saveTempFile(getFuncName(dir, tmplClient.PackageName), func() []byte {
+			var buf bytes.Buffer
+			tmplClient.Gen(&buf)
+			return buf.Bytes()
+		})
 
-			var funcBuf bytes.Buffer
-			tmplClient.Gen(&funcBuf)
-			fmtType, err := format.Source(funcBuf.Bytes())
-			if err != nil {
-				fmt.Printf("fmt func fail:%s\n", err)
-				os.Stdout.Write(funcBuf.Bytes())
-				return
-			}
-
-			os.WriteFile(funcFileName, fmtType, 0644)
-		} else {
-			fmt.Printf("%s 已经存在，忽略\n", funcFileName)
-		}
-
-		typeFileName := dir + "/" + tmplClient.PackageName + "_type.go"
-		if b, _ := exists(typeFileName); !b {
-
+		saveTempFile(getTypeName(dir, tmplClient.PackageName), func() []byte {
 			var typeBuf bytes.Buffer
 			tmplType.Gen(&typeBuf)
-			fmtType, err := format.Source(typeBuf.Bytes())
-			if err != nil {
-				fmt.Printf("fmt type fail:%s\n", err)
-				os.Stdout.Write(typeBuf.Bytes())
-				return
-			}
+			return typeBuf.Bytes()
+		})
+		saveTempFile(getLogicName(dir, tmplClient.PackageName), func() []byte {
+			var buf bytes.Buffer
+			tmplClient.GenLogic(&buf)
+			return buf.Bytes()
+		})
 
-			//os.Stdout.Write(fmtType)
-			os.WriteFile(typeFileName, fmtType, 0644)
+	}
+}
+
+func getFuncName(dir string, packageName string) string {
+	return dir + "/" + packageName + ".go"
+}
+
+func getTypeName(dir string, packageName string) string {
+	return dir + "/" + packageName + "_type.go"
+}
+
+func getLogicName(dir string, packageName string) string {
+	return dir + "/" + packageName + "_logic.go"
+}
+
+func saveTempFile(fileName string, getTmpl func() []byte) {
+
+	if b, _ := exists(fileName); !b {
+
+		buf := getTmpl()
+		fmtType, err := format.Source(buf)
+		if err != nil {
+			fmt.Printf("%s fail:%s\n", fileName, err)
+			os.Stdout.Write(buf)
+			return
 		}
+
+		//os.Stdout.Write(fmtType)
+		os.WriteFile(fileName, fmtType, 0644)
+	} else {
+		fmt.Printf("%s 已经存在，忽略\n", fileName)
 	}
 }

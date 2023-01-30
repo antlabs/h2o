@@ -25,11 +25,13 @@ type {{.StructName}} struct {
 }
 
 func New() *{{.StructName}} {
-  return &{{.StructName}}{
+  rv := &{{.StructName}}{
   {{- range $key, $value := .InitField}}
     {{$key}}:{{$value|printf "%q"}},
   {{- end}}
   }
+  rv.Init()
+  return rv
 }
 
 // set xxx 成员函数
@@ -81,6 +83,11 @@ func ({{$ReceiverName}} *{{$StructName}}) {{$value.HandlerName}}({{if $value.Req
 }
 {{end}}
  `
+
+	httpClientLogicTemplate = `package {{.PackageName}}
+  func ({{.ReceiverName}} *{{.StructName}}) Init() {
+  }
+`
 )
 
 type ClientTmpl struct {
@@ -108,6 +115,17 @@ type Func struct {
 func newFuncTemplate() *template.Template {
 	tmpl := httpClientTemplate
 	return template.Must(template.New("h2o-http-client-tmpl").Parse(tmpl))
+}
+
+func newFuncLogicTemplate() *template.Template {
+	tmpl := httpClientLogicTemplate
+	return template.Must(template.New("h2o-http-client-logic-tmpl").Parse(tmpl))
+}
+
+// 生成业务逻辑
+func (h *ClientTmpl) GenLogic(w io.Writer) {
+	tpl := newFuncLogicTemplate()
+	tpl.Execute(w, *h)
 }
 
 func (h *ClientTmpl) Gen(w io.Writer) {
