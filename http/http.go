@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"sort"
 	"strings"
 
 	"github.com/antlabs/h2o/http/client"
@@ -48,7 +49,7 @@ func getBody(bodyName string, bodyData any, newType map[string]string, encode mo
 		tagName = "form"
 	}
 
-	getVal := make(map[string]string)
+	getVal := make(map[string]any)
 
 	for _, v := range bodyDefKey {
 		getVal[v] = ""
@@ -57,9 +58,11 @@ func getBody(bodyName string, bodyData any, newType map[string]string, encode mo
 	var data []byte
 	switch v := bodyData.(type) {
 	case map[string]any:
-		data, err = json.Marshal(v, option.WithStructName(body.Name), option.WithTagName(tagName), option.WithSpecifyType(newType), option.WithGetValue(getVal))
+		data, err = json.Marshal(v, option.WithStructName(body.Name), option.WithTagName(tagName), option.WithSpecifyType(newType),
+			option.WithGetRawValue(getVal))
 	case []any:
-		data, err = json.Marshal(v, option.WithStructName(body.Name), option.WithTagName(tagName), option.WithSpecifyType(newType), option.WithGetValue(getVal))
+		data, err = json.Marshal(v, option.WithStructName(body.Name), option.WithTagName(tagName), option.WithSpecifyType(newType),
+			option.WithGetRawValue(getVal))
 	default:
 		body.Name = ""
 	}
@@ -68,64 +71,60 @@ func getBody(bodyName string, bodyData any, newType map[string]string, encode mo
 		rvDefaultBody = make([]model.KeyVal[string, string], 0, len(getVal))
 		for k, v := range getVal {
 			fieldName, _ := name.GetFieldAndTagName(k)
-			rvDefaultBody = append(rvDefaultBody, model.KeyVal[string, string]{Key: fieldName, Val: v})
+			rvDefaultBody = append(rvDefaultBody, model.KeyVal[string, string]{Key: fieldName, Val: fmt.Sprint(v), RawVal: v})
+
 		}
+		sort.Slice(rvDefaultBody, func(i, j int) bool {
+			return rvDefaultBody[i].Key < rvDefaultBody[i].Key
+		})
 	}
 
 	body.StructType = string(data)
 	return
 }
 
-func getHeader(headerName string, headerArray []string, defaultHeader []string) (
+func getHeader(headerName string, headerSlice []string, defaultHeader []string) (
 	htmpl client.Header,
 	rvDefaultHeader []model.KeyVal[string, string],
 	err error) {
 
 	// http header
-	if len(headerArray) == 0 {
+	if len(headerSlice) == 0 {
 		return
 	}
 
+	hmap := sliceToHTTPHeader(headerSlice)
 	htmpl.Name = headerName
-	hmap := make(http.Header)
-	for _, v := range headerArray {
-		pos := strings.Index(v, ":")
-		if pos == -1 {
+
+	getVal := make(map[string]any)
+
+	for _, v := range defaultHeader {
+		_, ok := hmap[v]
+		if !ok {
 			continue
 		}
 
-		val := v[pos+1:]
-		if len(val) == 0 {
-			continue
-		}
-		if val[0] == ' ' {
-			val = val[1:]
-		}
-		hmap.Set(v[:pos], val)
-	}
-
-	if len(defaultHeader) > 0 {
-		for _, v := range defaultHeader {
-			hv, ok := hmap[v]
-			if !ok {
-				continue
-			}
-
-			if len(hv) == 0 {
-				continue
-			}
-
-			fieldName, _ := name.GetFieldAndTagName(v)
-			rvDefaultHeader = append(rvDefaultHeader, model.KeyVal[string, string]{Key: fieldName, Val: hv[0]})
-		}
+		getVal[v] = ""
+		//fieldName, _ := name.GetFieldAndTagName(v)
+		//rvDefaultHeader = append(rvDefaultHeader, model.KeyVal[string, string]{Key: fieldName, Val: hv[0]})
 	}
 
 	var data []byte
 	data, err = header.Marshal(hmap, option.WithStructName(htmpl.Name),
-		//option.WithOutputFmtBefore(),
-		option.WithTagName("header"), option.WithTagNameFromKey())
+		option.WithTagName("header"), option.WithTagNameFromKey(), option.WithGetRawValue(getVal))
 	if err != nil {
 		return
+	}
+
+	if len(getVal) > 0 {
+		rvDefaultHeader = make([]model.KeyVal[string, string], 0, len(getVal))
+		for k, v := range getVal {
+			fieldName, _ := name.GetFieldAndTagName(k)
+			rvDefaultHeader = append(rvDefaultHeader, model.KeyVal[string, string]{Key: fieldName, Val: fmt.Sprint(v), RawVal: v})
+		}
+		sort.Slice(rvDefaultHeader, func(i, j int) bool {
+			return rvDefaultHeader[i].Key < rvDefaultHeader[i].Key
+		})
 	}
 
 	htmpl.StructType = string(data)
@@ -308,4 +307,25 @@ func saveTempFile(fileName string, getTmpl func() []byte) {
 	} else {
 		fmt.Printf("%s 已经存在，忽略\n", fileName)
 	}
+}
+
+func sliceToHTTPHeader(headerSlice []string) http.Header {
+
+	hmap := make(http.Header)
+	for _, v := range headerSlice {
+		pos := strings.Index(v, ":")
+		if pos == -1 {
+			continue
+		}
+
+		val := v[pos+1:]
+		if len(val) == 0 {
+			continue
+		}
+		if val[0] == ' ' {
+			val = val[1:]
+		}
+		hmap.Set(v[:pos], val)
+	}
+	return hmap
 }
