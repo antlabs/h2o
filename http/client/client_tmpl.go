@@ -60,7 +60,9 @@ func ({{$ReceiverName}} *{{$StructName}}) {{$value.HandlerName}}({{if $value.Req
   {{- end}}
 
   code := 0
-  err := gout.{{.Method}}({{$value.URL|printf "%q"}}, *{{$ReceiverName}}){{if .HaveHeader}}.
+  err := gout.{{.Method}}({{$value.URL|printf "%q"}}, *{{$ReceiverName}}).
+  RequestUse({{$ReceiverName}})
+  {{- if .HaveHeader}}.
   SetHeader(req.Header)
   {{- end}}{{- if .HaveQuery}}.
   SetQuery(req.Query){{end}}{{if .HaveReqBody}}.
@@ -85,7 +87,16 @@ func ({{$ReceiverName}} *{{$StructName}}) {{$value.HandlerName}}({{if $value.Req
  `
 
 	httpClientLogicTemplate = `package {{.PackageName}}
+
+  import(
+    "net/http"
+  )
+
   func ({{.ReceiverName}} *{{.StructName}}) Init() {
+  }
+
+  func ({{.ReceiverName}} *{{.StructName}}) ModifyRequest(req *http.Request) (err error) {
+    return
   }
 `
 )
