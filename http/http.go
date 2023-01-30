@@ -71,7 +71,8 @@ func getBody(bodyName string, bodyData any, newType map[string]string, encode mo
 		rvDefaultBody = make([]model.KeyVal[string, string], 0, len(getVal))
 		for k, v := range getVal {
 			fieldName, _ := name.GetFieldAndTagName(k)
-			rvDefaultBody = append(rvDefaultBody, model.KeyVal[string, string]{Key: fieldName, Val: fmt.Sprint(v), RawVal: v})
+			rvDefaultBody = append(rvDefaultBody,
+				(&model.KeyVal[string, string]{Key: fieldName, Val: fmt.Sprint(v), RawVal: v}).SetIs())
 
 		}
 		sort.Slice(rvDefaultBody, func(i, j int) bool {
@@ -120,7 +121,7 @@ func getHeader(headerName string, headerSlice []string, defaultHeader []string) 
 		rvDefaultHeader = make([]model.KeyVal[string, string], 0, len(getVal))
 		for k, v := range getVal {
 			fieldName, _ := name.GetFieldAndTagName(k)
-			rvDefaultHeader = append(rvDefaultHeader, model.KeyVal[string, string]{Key: fieldName, Val: fmt.Sprint(v), RawVal: v})
+			rvDefaultHeader = append(rvDefaultHeader, (&model.KeyVal[string, string]{Key: fieldName, Val: fmt.Sprint(v), RawVal: v}).SetIs())
 		}
 		sort.Slice(rvDefaultHeader, func(i, j int) bool {
 			return rvDefaultHeader[i].Key < rvDefaultHeader[i].Key

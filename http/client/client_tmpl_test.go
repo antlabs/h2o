@@ -103,8 +103,9 @@ func Test_newFuncTmpl_BodyDef(t *testing.T) {
 			ReqWWWForm: true,
 			DefReqBody: []model.KeyVal[string, string]{
 				{
-					Key: ".grant_type",
-					Val: "client_credentials",
+					Key:      "Grant_type",
+					Val:      "client_credentials",
+					IsString: true,
 				},
 			},
 			//DefReqHeader: []model.KeyVal[string, string]{{Key: "Accept", Val: "json"}},

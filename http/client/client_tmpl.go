@@ -52,11 +52,40 @@ func ({{$ReceiverName}} *{{$StructName}}) {{$value.HandlerName}}({{if $value.Req
   {{if $value.ReqName}}var resp {{$value.RespName}}{{end}}
 
   {{- range $_, $val := .DefReqHeader}}
-  req.Header.{{$val.Key}} = {{$val.Val|printf "%q"}}
+  {{- if $val.IsString}}
+  if len(req.Header.{{$val.Key}}) == 0 {
+    req.Header.{{$val.Key}} = {{$val.Val|printf "%q"}}
+  }
+  {{- end}}
+  {{- if $val.IsInt}}
+  if req.Header.{{$val.Key}} == 0 {
+    req.Header.{{$val.Key}} = {{$val.Val}}
+  }
+  {{- end}}
+  {{- if $val.IsFloat64}}
+  if req.Header.{{$val.Key}} == 0.0 {
+    req.Header.{{$val.Key}} = {{$val.Val}}
+  }
+  {{- end}}
   {{- end}}
 
   {{- range $_, $val := .DefReqBody}}
-  req.Body.{{$val.Key}} = {{$val.Val|printf "%q"}}
+
+  {{- if $val.IsString}}
+  if len(req.Body.{{$val.Key}}) == 0 {
+    req.Body.{{$val.Key}} = {{$val.Val|printf "%q"}}
+  }
+  {{- end}}
+  {{- if $val.IsInt}}
+  if req.Body.{{$val.Key}} == 0 {
+    req.Body.{{$val.Key}} = {{$val.Val}}
+  }
+  {{- end}}
+  {{- if $val.IsFloat64}}
+  if req.Body.{{$val.Key}} == 0.0 {
+    req.Body.{{$val.Key}} = {{$val.Val}}
+  }
+  {{- end}}
   {{- end}}
 
   code := 0
