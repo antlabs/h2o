@@ -2,33 +2,28 @@ package http
 
 import (
 	"bytes"
-	stdjson "encoding/json"
 	"fmt"
-	"go/format"
-	"net/http"
 	"os"
 	"path"
-	"sort"
 	"strings"
 
 	"github.com/antlabs/h2o/http/client"
+	"github.com/antlabs/h2o/internal/save"
 	"github.com/antlabs/h2o/model"
 	"github.com/antlabs/h2o/parser"
-	"github.com/antlabs/tostruct/header"
-	"github.com/antlabs/tostruct/json"
-	"github.com/antlabs/tostruct/name"
+	"github.com/antlabs/h2o/pyaml"
 	"github.com/antlabs/tostruct/option"
 	"github.com/antlabs/tostruct/url"
 )
 
-// 生成客户端代码
+// 1.生成客户端代码, OK
 // h2o http -f ./testdata/dst.yaml -g client
 
 // TODO
-// 生成服务端代码
+// 2.生成服务端代码
 // h2o http -f ./testdata/dst.yaml -g server
 
-// TODO
+// 3.TODO
 // 生成客户端和服务端代码
 // h2o http -f ./testdata/dst.yaml -g client server
 type HTTP struct {
@@ -37,113 +32,7 @@ type HTTP struct {
 	Dir  string   `clop:"short;long" usage:"gen dir" default:"."`
 }
 
-func getBody(bodyName string, bodyData any, newType map[string]string, encode model.Encode, bodyDefKey []string) (
-	body client.Body,
-	rvDefaultBody []model.KeyVal[string, string],
-	err error) {
-
-	body.Name = bodyName + "Body"
-
-	tagName := "json"
-	if encode.Body == model.WWWForm {
-		tagName = "form"
-	}
-
-	getVal := make(map[string]any)
-
-	for _, v := range bodyDefKey {
-		getVal[v] = ""
-	}
-
-	var data []byte
-	switch v := bodyData.(type) {
-	case map[string]any:
-		data, err = json.Marshal(v, option.WithStructName(body.Name), option.WithTagName(tagName), option.WithSpecifyType(newType),
-			option.WithGetRawValue(getVal))
-	case []any:
-		data, err = json.Marshal(v, option.WithStructName(body.Name), option.WithTagName(tagName), option.WithSpecifyType(newType),
-			option.WithGetRawValue(getVal))
-	default:
-		body.Name = ""
-	}
-
-	if len(getVal) > 0 {
-		rvDefaultBody = make([]model.KeyVal[string, string], 0, len(getVal))
-		for k, v := range getVal {
-			fieldName, _ := name.GetFieldAndTagName(k)
-			rvDefaultBody = append(rvDefaultBody,
-				(&model.KeyVal[string, string]{Key: fieldName, Val: fmt.Sprint(v), RawVal: v}).SetIs())
-
-		}
-		sort.Slice(rvDefaultBody, func(i, j int) bool {
-			return rvDefaultBody[i].Key < rvDefaultBody[i].Key
-		})
-	}
-
-	body.StructType = string(data)
-	return
-}
-
-func getHeader(headerName string, headerSlice []string, defaultHeader []string) (
-	htmpl client.Header,
-	rvDefaultHeader []model.KeyVal[string, string],
-	err error) {
-
-	// http header
-	if len(headerSlice) == 0 {
-		return
-	}
-
-	hmap := sliceToHTTPHeader(headerSlice)
-	htmpl.Name = headerName
-
-	getVal := make(map[string]any)
-
-	for _, v := range defaultHeader {
-		_, ok := hmap[v]
-		if !ok {
-			continue
-		}
-
-		getVal[v] = ""
-		//fieldName, _ := name.GetFieldAndTagName(v)
-		//rvDefaultHeader = append(rvDefaultHeader, model.KeyVal[string, string]{Key: fieldName, Val: hv[0]})
-	}
-
-	var data []byte
-	data, err = header.Marshal(hmap, option.WithStructName(htmpl.Name),
-		option.WithTagName("header"), option.WithTagNameFromKey(), option.WithGetRawValue(getVal))
-	if err != nil {
-		return
-	}
-
-	if len(getVal) > 0 {
-		rvDefaultHeader = make([]model.KeyVal[string, string], 0, len(getVal))
-		for k, v := range getVal {
-			fieldName, _ := name.GetFieldAndTagName(k)
-			rvDefaultHeader = append(rvDefaultHeader, (&model.KeyVal[string, string]{Key: fieldName, Val: fmt.Sprint(v), RawVal: v}).SetIs())
-		}
-		sort.Slice(rvDefaultHeader, func(i, j int) bool {
-			return rvDefaultHeader[i].Key < rvDefaultHeader[i].Key
-		})
-	}
-
-	htmpl.StructType = string(data)
-	return
-}
-
-func exists(path string) (bool, error) {
-	_, err := os.Stat(path)
-	if err == nil {
-		return true, nil
-	}
-
-	if os.IsNotExist(err) {
-		return false, nil
-	}
-	return false, err
-}
-
+// 入口函数
 func (h *HTTP) SubMain() {
 	for _, f := range h.File {
 
@@ -159,29 +48,20 @@ func (h *HTTP) SubMain() {
 			ReceiverName: string(c.Init.Resp.Name[0]),
 		}
 
-		tmplType := client.TypeTmpl{PackageName: c.Package}
+		tmplType := pyaml.TypeTmpl{PackageName: c.Package}
 
 		for _, h := range c.Muilt {
 
+			h.ModifyHandler()
 			handler := h.Handler
 			// 去除前面的包名, TODO 没有如果点就是普通函数
-			if pos := strings.Index(handler, "."); pos != -1 {
-				handler = handler[pos+1:]
-			}
-
 			if handler == "" {
 				panic("handler name is empty")
 			}
 
-			if h.Req.Name == "" {
-				h.Req.Name = handler + "Req"
-			}
+			h.Req.Name, h.Resp.Name = h.GetReqName(), h.GetRespName()
 
-			if h.Resp.Name == "" {
-				h.Resp.Name = handler + "Resp"
-			}
-
-			var query client.Query
+			var query pyaml.Query
 			if len(h.Req.URL) > 0 {
 				query.Name = h.Req.Name + "Query"
 				if pos := strings.Index(h.Req.URL, "?"); pos != -1 {
@@ -199,40 +79,21 @@ func (h *HTTP) SubMain() {
 				}
 			}
 
-			reqHeader, defReqHeader, err := getHeader(h.Req.Name+"Header", h.Req.Header, h.Req.UseDefault.Header)
+			reqHeader, defReqHeader, respHeader, _, err := pyaml.GetHeader(h)
 			if err != nil {
-				fmt.Printf("get request header:%s, %v\n", err, h.Req.Header)
 				return
 			}
 
-			respHeader, _, err := getHeader(h.Resp.Name+"Header", h.Resp.Header, nil)
-			if err != nil {
-				fmt.Printf("get request body:%s\n", err)
-				return
-			}
+			reqBody, defReqBody, respBody, err := pyaml.GetBody(h)
 
-			reqBody, defReqBody, err := getBody(h.Req.Name, h.Req.Body, h.Req.NewType, h.Req.Encode, h.Req.UseDefault.Body)
-			if err != nil {
-				fmt.Printf("get request body:%s\n", err)
-				return
-			}
-
-			respBody, _, err := getBody(h.Resp.Name, h.Resp.Body, h.Resp.NewType, model.Encode{}, nil)
-			if err != nil {
-				fmt.Printf("get response body:%s \n", err)
-				all, _ := stdjson.Marshal(h.Resp.Body)
-				fmt.Println(string(all), err, h.Resp.Body == nil)
-				return
-			}
-
-			tmplType.ReqResp = append(tmplType.ReqResp, client.ReqResp{
-				Req: client.Req{
+			tmplType.ReqResp = append(tmplType.ReqResp, pyaml.ReqResp{
+				Req: pyaml.Req{
 					Name:   h.Req.Name,
 					Query:  query,
 					Header: reqHeader,
 					Body:   reqBody,
 				},
-				Resp: client.Resp{
+				Resp: pyaml.Resp{
 					Name:   h.Resp.Name,
 					Header: respHeader,
 					Body:   respBody,
@@ -259,18 +120,18 @@ func (h *HTTP) SubMain() {
 		dir = path.Clean(dir)
 		os.MkdirAll(dir, 0755)
 
-		saveTempFile(getFuncName(dir, tmplClient.PackageName), func() []byte {
+		save.TmplFile(getFuncName(dir, tmplClient.PackageName), func() []byte {
 			var buf bytes.Buffer
 			tmplClient.Gen(&buf)
 			return buf.Bytes()
 		})
 
-		saveTempFile(getTypeName(dir, tmplClient.PackageName), func() []byte {
+		save.TmplFile(getTypeName(dir, tmplClient.PackageName), func() []byte {
 			var typeBuf bytes.Buffer
-			tmplType.Gen(&typeBuf)
+			client.Gen(&tmplType, &typeBuf)
 			return typeBuf.Bytes()
 		})
-		saveTempFile(getLogicName(dir, tmplClient.PackageName), func() []byte {
+		save.TmplFile(getLogicName(dir, tmplClient.PackageName), func() []byte {
 			var buf bytes.Buffer
 			tmplClient.GenLogic(&buf)
 			return buf.Bytes()
@@ -289,44 +150,4 @@ func getTypeName(dir string, packageName string) string {
 
 func getLogicName(dir string, packageName string) string {
 	return dir + "/" + packageName + "_logic.go"
-}
-
-func saveTempFile(fileName string, getTmpl func() []byte) {
-
-	if b, _ := exists(fileName); !b {
-
-		buf := getTmpl()
-		fmtType, err := format.Source(buf)
-		if err != nil {
-			fmt.Printf("%s fail:%s\n", fileName, err)
-			os.Stdout.Write(buf)
-			return
-		}
-
-		//os.Stdout.Write(fmtType)
-		os.WriteFile(fileName, fmtType, 0644)
-	} else {
-		fmt.Printf("%s 已经存在，忽略\n", fileName)
-	}
-}
-
-func sliceToHTTPHeader(headerSlice []string) http.Header {
-
-	hmap := make(http.Header)
-	for _, v := range headerSlice {
-		pos := strings.Index(v, ":")
-		if pos == -1 {
-			continue
-		}
-
-		val := v[pos+1:]
-		if len(val) == 0 {
-			continue
-		}
-		if val[0] == ' ' {
-			val = val[1:]
-		}
-		hmap.Set(v[:pos], val)
-	}
-	return hmap
 }

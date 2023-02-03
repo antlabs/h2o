@@ -1,4 +1,4 @@
-package client
+package pb
 
 import (
 	"io"
@@ -8,17 +8,16 @@ import (
 )
 
 const (
-	httpTypeTemplate = `
-package {{.PackageName}}
+	pbTypeTemplate = `
 
   {{range $value := .ReqResp}}
-    type {{$value.Req.Name}} struct {
-      {{if $value.Req.Query.Name}} Query {{$value.Req.Query.Name}} {{end}}
-      {{if $value.Req.Body.Name }} Body {{$value.Req.Body.Name}} {{end}}
-      {{if $value.Req.Header.Name}} Header {{$value.Req.Header.Name}} {{end}}
+    message {{$value.Req.Name}} {
+      {{ if $value.Req.Query.Name}} Query {{$value.Req.Query.Name}} {{end}}
+      {{ if $value.Req.Body.Name }} Body {{$value.Req.Body.Name}} {{end}}
+      {{ if $value.Req.Header.Name}} Header {{$value.Req.Header.Name}} {{end}}
     }
 
-    type {{$value.Resp.Name}} struct {
+    message {{$value.Resp.Name}} {
       {{if $value.Resp.Header.Name}} Header {{$value.Resp.Header.Name}} {{end}}
       {{if $value.Resp.Body.Name}} Body {{$value.Resp.Body.Name}} {{end}}
     }
@@ -47,14 +46,14 @@ package {{.PackageName}}
     // 响应body结构体
     {{$value.Resp.Body.StructType}}
     {{end}}
-
   {{end}}
+
   `
 )
 
 func newTypeTemplate() *template.Template {
-	tmpl := httpTypeTemplate
-	return template.Must(template.New("h2o-http-client-type-tmpl").Parse(tmpl))
+	tmpl := pbTypeTemplate
+	return template.Must(template.New("h2o-pb-type-tmpl").Parse(tmpl))
 }
 
 func Gen(t *pyaml.TypeTmpl, w io.Writer) {

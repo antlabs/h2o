@@ -7,6 +7,7 @@ import (
 
 	"github.com/antlabs/h2o/codemsg"
 	"github.com/antlabs/h2o/http"
+	"github.com/antlabs/h2o/pb"
 	"github.com/antlabs/tostruct/json"
 	"github.com/antlabs/tostruct/option"
 	"github.com/antlabs/tostruct/yaml"
@@ -72,8 +73,10 @@ type H2O struct {
 	YAMLStruct YAML `clop:"subcommand" usage:"Generate structure from yaml"`
 	//子命令， 入口是SubMain
 	CodeMsg codemsg.CodeMsg `clop:"subcommand" usage:"Generate code in codemsg format from constants"`
-
+	// 子命令，生成http客户端代码和http服务端代码(TODO)
 	HTTP http.HTTP `clop:"subcommand" usage:"gen http code"`
+	//子命令，生成protobuf
+	PB pb.Pb `clop:"subcommand" usage:"gen protobuf code"`
 }
 
 func main() {
