@@ -6,3 +6,10 @@ guo.dev:
 	make
 	rm ~/go/bin/h2o
 	cp h2o ~/go/bin
+
+test.proto:
+	./h2o pb -f ./testdata/usertoken.yaml &>t.proto
+	protoc --go_out=. --go_opt=paths=source_relative \
+    --go-grpc_out=. --go-grpc_opt=paths=source_relative \
+    ./t.proto
+

@@ -3,10 +3,11 @@ package pb
 import (
 	"bytes"
 	"fmt"
-	"os"
 
+	"github.com/antlabs/h2o/internal/save"
 	"github.com/antlabs/h2o/parser"
 	"github.com/antlabs/h2o/pyaml"
+	"github.com/antlabs/tostruct/option"
 	//"github.com/antlabs/tostruct/protobuf"
 )
 
@@ -33,18 +34,18 @@ func (b *Pb) SubMain() {
 			h.ModifyHandler()
 
 			//protobuf.Marshal()
-			reqName, respName := h.GetReqName(), h.GetRespName()
+			h.Req.Name, h.Resp.Name = h.GetReqName(), h.GetRespName()
 
 			if h.Handler == "" {
 				panic("h.Handler is empty")
 			}
 
-			reqHeader, _, respHeader, _, err := pyaml.GetHeader(h)
+			reqHeader, _, respHeader, _, err := pyaml.GetHeader(h, option.WithProtobuf())
 			if err != nil {
 				return
 			}
 
-			reqBody, _, respBody, err := pyaml.GetBody(h)
+			reqBody, _, respBody, err := pyaml.GetBody(h, true)
 
 			tmplType.ReqResp = append(tmplType.ReqResp, pyaml.ReqResp{
 				Req: pyaml.Req{
@@ -62,10 +63,20 @@ func (b *Pb) SubMain() {
 			var typeOut bytes.Buffer
 			Gen(&tmplType, &typeOut)
 			tmplPb.PbType = typeOut.String()
-			tmplPb.Func = append(tmplPb.Func, Func{Name: h.Handler, ReqName: reqName, RespName: respName})
+			tmplPb.Func = append(tmplPb.Func, Func{Name: h.Handler, ReqName: h.Req.Name, RespName: h.Resp.Name})
+
 		}
 
-		tmplPb.Gen(&out)
-		os.Stdout.Write(out.Bytes())
+		dir := save.Mkdir(b.Dir, c.Package)
+		//fmt.Println("dir###", dir, b.Dir, c.Package)
+		save.TmplFile(getProtoBuf(dir, c.Package), false, func() []byte {
+			tmplPb.Gen(&out)
+			return out.Bytes()
+			//os.Stdout.Write(out.Bytes())
+		})
 	}
+}
+
+func getProtoBuf(name string, pacakge string) string {
+	return fmt.Sprintf("%s/%s.proto", name, pacakge)
 }

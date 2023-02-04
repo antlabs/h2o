@@ -3,8 +3,6 @@ package http
 import (
 	"bytes"
 	"fmt"
-	"os"
-	"path"
 	"strings"
 
 	"github.com/antlabs/h2o/http/client"
@@ -61,6 +59,9 @@ func (h *HTTP) SubMain() {
 
 			h.Req.Name, h.Resp.Name = h.GetReqName(), h.GetRespName()
 
+			if h.Req.Name == "" {
+				panic("req name is empty")
+			}
 			var query pyaml.Query
 			if len(h.Req.URL) > 0 {
 				query.Name = h.Req.Name + "Query"
@@ -84,7 +85,7 @@ func (h *HTTP) SubMain() {
 				return
 			}
 
-			reqBody, defReqBody, respBody, err := pyaml.GetBody(h)
+			reqBody, defReqBody, respBody, err := pyaml.GetBody(h, false)
 
 			tmplType.ReqResp = append(tmplType.ReqResp, pyaml.ReqResp{
 				Req: pyaml.Req{
@@ -116,22 +117,19 @@ func (h *HTTP) SubMain() {
 			})
 		}
 
-		dir := h.Dir + "/" + tmplClient.PackageName
-		dir = path.Clean(dir)
-		os.MkdirAll(dir, 0755)
-
-		save.TmplFile(getFuncName(dir, tmplClient.PackageName), func() []byte {
+		dir := save.Mkdir(h.Dir, tmplClient.PackageName)
+		save.TmplFile(getFuncName(dir, tmplClient.PackageName), true, func() []byte {
 			var buf bytes.Buffer
 			tmplClient.Gen(&buf)
 			return buf.Bytes()
 		})
 
-		save.TmplFile(getTypeName(dir, tmplClient.PackageName), func() []byte {
+		save.TmplFile(getTypeName(dir, tmplClient.PackageName), true, func() []byte {
 			var typeBuf bytes.Buffer
 			client.Gen(&tmplType, &typeBuf)
 			return typeBuf.Bytes()
 		})
-		save.TmplFile(getLogicName(dir, tmplClient.PackageName), func() []byte {
+		save.TmplFile(getLogicName(dir, tmplClient.PackageName), true, func() []byte {
 			var buf bytes.Buffer
 			tmplClient.GenLogic(&buf)
 			return buf.Bytes()

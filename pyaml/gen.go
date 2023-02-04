@@ -12,21 +12,22 @@ import (
 	"github.com/antlabs/tostruct/json"
 	"github.com/antlabs/tostruct/name"
 	"github.com/antlabs/tostruct/option"
+	"github.com/antlabs/tostruct/protobuf"
 )
 
-func GetBody(h model.Muilt) (reqBody Body, defReqBody []model.KeyVal[string, string], respBody Body, err error) {
+func GetBody(h model.Muilt, isProtobuf bool) (reqBody Body, defReqBody []model.KeyVal[string, string], respBody Body, err error) {
 
 	reqBody, defReqBody, err = getBody(h.Req.Name,
 		h.Req.Body,
 		h.Req.NewType,
 		h.Req.Encode,
-		h.Req.UseDefault.Body)
+		h.Req.UseDefault.Body, isProtobuf)
 	if err != nil {
 		fmt.Printf("get request body:%s\n", err)
 		return
 	}
 
-	respBody, _, err = getBody(h.Resp.Name, h.Resp.Body, h.Resp.NewType, model.Encode{}, nil)
+	respBody, _, err = getBody(h.Resp.Name, h.Resp.Body, h.Resp.NewType, model.Encode{}, nil, isProtobuf)
 	if err != nil {
 		fmt.Printf("get response body:%s \n", err)
 		all, _ := stdjson.Marshal(h.Resp.Body)
@@ -53,7 +54,7 @@ func GetHeader(h model.Muilt, opt ...option.OptionFunc) (reqHeader Header, defRe
 	return
 }
 
-func getBody(bodyName string, bodyData any, newType map[string]string, encode model.Encode, bodyDefKey []string) (
+func getBody(bodyName string, bodyData any, newType map[string]string, encode model.Encode, bodyDefKey []string, isProtobuf bool) (
 	body Body,
 	rvDefaultBody []model.KeyVal[string, string],
 	err error) {
@@ -74,12 +75,21 @@ func getBody(bodyName string, bodyData any, newType map[string]string, encode mo
 	var data []byte
 	switch v := bodyData.(type) {
 	case map[string]any:
-		data, err = json.Marshal(v, option.WithStructName(body.Name),
+		if isProtobuf {
+			data, err = protobuf.Marshal(v, option.WithStructName(body.Name))
+		} else {
+			data, err = json.Marshal(v,
+				option.WithStructName(body.Name),
+				option.WithTagName(tagName),
+				option.WithSpecifyType(newType),
+				option.WithGetRawValue(getVal))
+		}
+	case []any:
+		// protobuf数组暂时不支持
+		data, err = json.Marshal(v,
+			option.WithStructName(body.Name),
 			option.WithTagName(tagName),
 			option.WithSpecifyType(newType),
-			option.WithGetRawValue(getVal))
-	case []any:
-		data, err = json.Marshal(v, option.WithStructName(body.Name), option.WithTagName(tagName), option.WithSpecifyType(newType),
 			option.WithGetRawValue(getVal))
 	default:
 		body.Name = ""
