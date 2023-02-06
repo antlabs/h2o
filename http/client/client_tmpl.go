@@ -13,6 +13,7 @@ const (
 	httpClientTemplate = `package {{.PackageName}}
 
 import(
+  "context"
   "fmt"
 
   "github.com/guonaihong/gout"
@@ -48,8 +49,13 @@ func ({{$ReceiverName}} *{{$StructName}}) Set{{$key}} ({{$key}} string) *{{$Stru
 
 {{- range $_, $value := .AllFunc}}
 func ({{$ReceiverName}} *{{$StructName}}) {{$value.HandlerName}}({{if $value.ReqName}}req *{{$value.ReqName}}{{end}}) (*{{$value.RespName}}, error) {
+  return {{$ReceiverName}}.{{$value.HandlerName}}Ctx(context.TODO(), req)
+}
 
-  {{if $value.ReqName}}var resp {{$value.RespName}}{{end}}
+// 可以通过ctx设置超时时间
+func ({{$ReceiverName}} *{{$StructName}}) {{$value.HandlerName}}Ctx(ctx context.Context, {{if $value.ReqName}}req *{{$value.ReqName}}{{end}}) (*{{$value.RespName}}, error) {
+
+  {{if $value.RespName}}var resp {{$value.RespName}}{{end}}
 
   {{- range $_, $val := .DefReqHeader}}
   {{- if $val.IsString}}
@@ -100,6 +106,7 @@ func ({{$ReceiverName}} *{{$StructName}}) {{$value.HandlerName}}({{if $value.Req
   {{- else}}
   SetJSON(req.Body)
   {{- end}}{{end}}.
+  WithContext(ctx).
   BindJSON(&resp.Body).
   Code(&code).
   Do()

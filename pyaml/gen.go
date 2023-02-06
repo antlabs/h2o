@@ -85,12 +85,16 @@ func getBody(bodyName string, bodyData any, newType map[string]string, encode mo
 				option.WithGetRawValue(getVal))
 		}
 	case []any:
-		// protobuf数组暂时不支持
-		data, err = json.Marshal(v,
-			option.WithStructName(body.Name),
-			option.WithTagName(tagName),
-			option.WithSpecifyType(newType),
-			option.WithGetRawValue(getVal))
+		if isProtobuf {
+			data, err = protobuf.Marshal(v, option.WithStructName(body.Name))
+		} else {
+			// protobuf数组暂时不支持
+			data, err = json.Marshal(v,
+				option.WithStructName(body.Name),
+				option.WithTagName(tagName),
+				option.WithSpecifyType(newType),
+				option.WithGetRawValue(getVal))
+		}
 	default:
 		body.Name = ""
 	}
@@ -104,7 +108,7 @@ func getBody(bodyName string, bodyData any, newType map[string]string, encode mo
 
 		}
 		sort.Slice(rvDefaultBody, func(i, j int) bool {
-			return rvDefaultBody[i].Key < rvDefaultBody[i].Key
+			return rvDefaultBody[i].Key < rvDefaultBody[j].Key
 		})
 	}
 
@@ -153,7 +157,7 @@ func getHeader(headerName string, headerSlice []string, defaultHeader []string, 
 			rvDefaultHeader = append(rvDefaultHeader, (&model.KeyVal[string, string]{Key: fieldName, Val: fmt.Sprint(v), RawVal: v}).SetIs())
 		}
 		sort.Slice(rvDefaultHeader, func(i, j int) bool {
-			return rvDefaultHeader[i].Key < rvDefaultHeader[i].Key
+			return rvDefaultHeader[i].Key < rvDefaultHeader[j].Key
 		})
 	}
 
