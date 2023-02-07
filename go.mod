@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/antlabs/deepcopy v0.0.6
-	github.com/antlabs/tostruct v0.0.5
+	github.com/antlabs/tostruct v0.0.6
 	github.com/guonaihong/clop v0.2.9
 	github.com/stretchr/testify v1.8.1
 	golang.org/x/tools v0.5.0
