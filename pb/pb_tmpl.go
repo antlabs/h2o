@@ -8,7 +8,7 @@ import (
 const (
 	pbTmpl = `syntax = "proto3";
 
-option go_package="./{{.PackageName}}";
+option go_package="{{.PackageName}}";
 
 {{- .PbType}}
 service {{.ServiceName}} {

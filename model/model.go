@@ -3,9 +3,14 @@ package model
 import "strings"
 
 type Config struct {
-	Init    Init    `yaml:"init"`
-	Muilt   []Muilt `yaml:"muilt"`
-	Package string  `yaml:"package"`
+	Init     Init     `yaml:"init"`
+	Muilt    []Muilt  `yaml:"muilt"`
+	Package  string   `yaml:"package"`
+	Protobuf Protobuf `yaml:"protobuf"`
+}
+
+type Protobuf struct {
+	GoPackage string `yaml:"go_package"`
 }
 
 type Init struct {
@@ -63,19 +68,21 @@ type Encode struct {
 }
 
 type Req struct {
-	Encode     Encode            `yaml:"encode"`
-	URL        string            `yaml:"url"`
-	Name       string            `yaml:"name"`
-	NewType    map[string]string `yaml:"newType"`
-	Body       any               `yaml:"body"`
-	Header     []string          `yaml:"header"`
-	Method     string            `yaml:"method"`
-	UseDefault UseDefault        `yaml:"useDefault"`
+	Encode          Encode            `yaml:"encode"`
+	URL             string            `yaml:"url"`
+	Name            string            `yaml:"name"`
+	NewType         map[string]string `yaml:"newType"`
+	NewProtobufType map[string]string `yaml:"newProtobufType"`
+	Body            any               `yaml:"body"`
+	Header          []string          `yaml:"header"`
+	Method          string            `yaml:"method"`
+	UseDefault      UseDefault        `yaml:"useDefault"`
 }
 
 type Resp struct {
-	Name    string            `yaml:"name"`
-	NewType map[string]string `yaml:"newType"`
-	Body    any               `yaml:"body"`
-	Header  []string          `yaml:"header"`
+	Name            string            `yaml:"name"`
+	NewType         map[string]string `yaml:"newType"`
+	NewProtobufType map[string]string `yaml:"newProtobufType"`
+	Body            any               `yaml:"body"`
+	Header          []string          `yaml:"header"`
 }

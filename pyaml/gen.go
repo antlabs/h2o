@@ -17,9 +17,14 @@ import (
 
 func GetBody(h model.Muilt, isProtobuf bool) (reqBody Body, defReqBody []model.KeyVal[string, string], respBody Body, err error) {
 
+	newReqType := h.Req.NewType
+	if isProtobuf {
+		newReqType = h.Req.NewProtobufType
+	}
+
 	reqBody, defReqBody, err = getBody(h.Req.Name,
 		h.Req.Body,
-		h.Req.NewType,
+		newReqType,
 		h.Req.Encode,
 		h.Req.UseDefault.Body, isProtobuf)
 	if err != nil {
@@ -27,7 +32,12 @@ func GetBody(h model.Muilt, isProtobuf bool) (reqBody Body, defReqBody []model.K
 		return
 	}
 
-	respBody, _, err = getBody(h.Resp.Name, h.Resp.Body, h.Resp.NewType, model.Encode{}, nil, isProtobuf)
+	newRespType := h.Resp.NewType
+	if isProtobuf {
+		newRespType = h.Resp.NewProtobufType
+	}
+
+	respBody, _, err = getBody(h.Resp.Name, h.Resp.Body, newRespType, model.Encode{}, nil, isProtobuf)
 	if err != nil {
 		fmt.Printf("get response body:%s \n", err)
 		all, _ := stdjson.Marshal(h.Resp.Body)
@@ -76,7 +86,9 @@ func getBody(bodyName string, bodyData any, newType map[string]string, encode mo
 	switch v := bodyData.(type) {
 	case map[string]any:
 		if isProtobuf {
-			data, err = protobuf.Marshal(v, option.WithStructName(body.Name))
+			data, err = protobuf.Marshal(v,
+				option.WithStructName(body.Name),
+				option.WithSpecifyType(newType))
 		} else {
 			data, err = json.Marshal(v,
 				option.WithStructName(body.Name),
@@ -86,9 +98,11 @@ func getBody(bodyName string, bodyData any, newType map[string]string, encode mo
 		}
 	case []any:
 		if isProtobuf {
-			data, err = protobuf.Marshal(v, option.WithStructName(body.Name))
+			data, err = protobuf.Marshal(v,
+				option.WithStructName(body.Name),
+				option.WithSpecifyType(newType),
+			)
 		} else {
-			// protobuf数组暂时不支持
 			data, err = json.Marshal(v,
 				option.WithStructName(body.Name),
 				option.WithTagName(tagName),
@@ -138,8 +152,6 @@ func getHeader(headerName string, headerSlice []string, defaultHeader []string, 
 		}
 
 		getVal[v] = ""
-		//fieldName, _ := name.GetFieldAndTagName(v)
-		//rvDefaultHeader = append(rvDefaultHeader, model.KeyVal[string, string]{Key: fieldName, Val: hv[0]})
 	}
 
 	opt = append(opt, option.WithStructName(htmpl.Name),

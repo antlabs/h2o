@@ -1,5 +1,7 @@
 ---
 package: "usertoken"
+protobuf:
+  go_package: "./pb/im/v1/usertoken"
 init:
   handler: New #函数名, 名字是New认识是构造函数
   #req:
@@ -7,12 +9,12 @@ init:
   resp:
     name: UserToken #返回的结构体名
     field:
-      Host: www.xxx.com
+      Host:  a1.easemob.com 
       Org_name:  ""
       App_name: ""
 
 muilt:
-- handler: UserToken.CreateUserToken
+- handler: UserToken.GetUserToken
   req:
     method: POST
     url: https://{{.Host}}/{{.Org_name}}/{{.App_name}}/token
@@ -22,16 +24,16 @@ muilt:
       - Content-Type
       - Accept
       body:
-      - .grant_type
+        - .grant_type
     header:
     - 'Content-Type: application/json'
     - 'Accept: application/json'
     encode: 
       body:
     body:
-      grant_type: client_credentials
-      client_id: YXA6i-Ak8Ol4Eei2l11ZjV-EAg
-      client_secret: YXA6VunqiNxoB7IwXHInk1cGiXOOJfc
+      grant_type: password
+      username: C
+      password: '1'
       ttl: '1024000'
 
   resp:

@@ -1,5 +1,7 @@
 ---
 package: "metadata"
+protobuf:
+  go_package: "./pb/im/v1/metadata"
 init:
   handler: New #函数名, New是构造函数
   #req:

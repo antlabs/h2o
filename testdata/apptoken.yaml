@@ -1,5 +1,7 @@
 ---
 package: "apptoken"
+protobuf:
+  go_package: "./pb/im/v1/apptoken"
 init:
   handler: New #函数名, 名字是New认识是构造函数
   #req:
@@ -7,7 +9,7 @@ init:
   resp:
     name: AppToken #返回的结构体名
     field:
-      Host: www.xxx.com
+      Host: a1.easemob.com 
       Org_name:  ""
       App_name: ""
 
@@ -22,7 +24,7 @@ muilt:
       - Content-Type
       - Accept
       body:
-        # - .grant_type
+        - .grant_type
     header:
     - 'Content-Type: application/json'
     - 'Accept: application/json'

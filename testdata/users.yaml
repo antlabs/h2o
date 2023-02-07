@@ -1,5 +1,7 @@
 ---
 package: "users"
+protobuf:
+  go_package: "./pb/im/v1/users"
 init:
   handler: New #函数名, 名字是New认识是构造函数
   #req:
@@ -7,7 +9,7 @@ init:
   resp:
     name: Users #返回的结构体名
     field:
-      Host: www.xxx.com
+      Host: a1.easemob.com
       Org_name:  ""
       App_name: ""
       UserName: ""
@@ -561,6 +563,8 @@ muilt:
     name: UserOfflineMsgStatusResp
     newType:
       ".data": map[string]string
+    newProtobufType:
+      ".data": map<string, string>
     body:
       action: get
       uri: http://XXXX/XXXX/XXXX/users/user1/offline_msg_status/123
