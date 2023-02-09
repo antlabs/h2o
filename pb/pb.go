@@ -28,11 +28,18 @@ func (b *Pb) SubMain() {
 		}
 
 		tmplType := pyaml.TypeTmpl{PackageName: c.Package}
+
 		packageName := c.Package
-		if c.Protobuf.GoPackage != "" {
-			packageName = c.Protobuf.GoPackage
+		if c.Protobuf.Package != "" {
+			packageName = c.Protobuf.Package
 		}
-		tmplPb := PbTmpl{PackageName: packageName, ServiceName: c.Package}
+
+		goPackageName := c.Package
+		if c.Protobuf.GoPackage != "" {
+			goPackageName = c.Protobuf.GoPackage
+		}
+
+		tmplPb := PbTmpl{GoPackageName: goPackageName, PackageName: packageName, ServiceName: c.Package}
 		for _, h := range c.Muilt {
 
 			h.ModifyHandler()

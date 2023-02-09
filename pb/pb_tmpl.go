@@ -8,7 +8,8 @@ import (
 const (
 	pbTmpl = `syntax = "proto3";
 
-option go_package="{{.PackageName}}";
+package {{.PackageName}};
+option go_package="{{.GoPackageName}}";
 
 {{- .PbType}}
 service {{.ServiceName}} {
@@ -20,10 +21,11 @@ service {{.ServiceName}} {
 )
 
 type PbTmpl struct {
-	ServiceName string
-	PackageName string
-	Func        []Func
-	PbType      string //这里面都是类型定义
+	PackageName   string
+	GoPackageName string
+	ServiceName   string
+	Func          []Func
+	PbType        string //这里面都是类型定义
 }
 
 type Func struct {

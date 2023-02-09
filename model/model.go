@@ -10,6 +10,7 @@ type Config struct {
 }
 
 type Protobuf struct {
+	Package   string `yaml:"package"`
 	GoPackage string `yaml:"go_package"`
 }
 
