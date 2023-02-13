@@ -3,6 +3,8 @@ package codemsg
 import (
 	"html/template"
 	"io"
+
+	"github.com/gobeam/stringy"
 )
 
 const codemsgTmpl = `
@@ -16,42 +18,44 @@ const codemsgTmpl = `
     "encoding/json"
   )
 	
-	type {{.CodeMsgName}} struct {
-    {{.CodeName}}    {{.TypeName}} "json:\"{{.CodeName}}\"" 
-    {{.MessageName}} string  "json:\"{{.MessageName}}\""
+	type {{.CodeMsgStructName}} struct {
+    {{.CodeName}}    {{.TypeName}} "json:\"{{.CodeTagName}}\"" 
+    {{.MsgName}} string  "json:\"{{.MsgTagName}}\""
 	}
 
-	func (x *{{.CodeMsgName}}) Error() string {
+	func (x *{{.CodeMsgStructName}}) Error() string {
     all, _ := json.Marshal(x) 
     var b strings.Builder 
     b.Write(all) 
     return b.String()
 	}
 
-	func New{{.CodeMsgName}}(code {{.TypeName}}) error {
+	func New{{.CodeMsgStructName}}(code {{.TypeName}}) error {
     return &CodeMsg{
       {{.CodeName}}: code,
-      {{.MessageName}}: code.String(),
+      {{.MsgName}}: code.String(),
 	  }
 	}
 
-  {{- $CodeMsgName := .CodeMsgName}}
+  {{- $CodeMsgStructName := .CodeMsgStructName}}
   var (
   {{range $_, $value := .AllVariable}}
-		ErrCodeMsg{{$value.OriginalName}} error = New{{$CodeMsgName}}({{.OriginalName}}) //{{$value.Name}}
+		ErrCodeMsg{{$value.OriginalName}} error = New{{$CodeMsgStructName}}({{.OriginalName}}) //{{$value.Name}}
   {{end}}
   )
   `
 
 type CodeMsgTmpl struct {
-	PkgName      string // 包名
-	TypeName     string
-	CodeMsgName  string // CodeMsg{Code int, Message string} 结构体的名字
-	CodeName     string // 修改Code字段的名字
-	MessageName  string // 修改Message 字段的名字
-	Args         string // os.Args[2:]
-	OriginalName string //
-	AllVariable  []Value
+	PkgName           string // 包名
+	TypeName          string
+	CodeMsgStructName string // CodeMsg{Code int, Message string} 结构体的名字
+	CodeName          string // 修改Code字段的名字
+	MsgName           string // 修改Message 字段的名字
+	MsgTagName        string
+	CodeTagName       string
+	Args              string // os.Args[2:]
+	OriginalName      string //
+	AllVariable       []Value
 }
 
 func newFuncTemplate() *template.Template {
@@ -59,7 +63,10 @@ func newFuncTemplate() *template.Template {
 	return template.Must(template.New("h2o-codemsg-tmpl").Parse(tmpl))
 }
 
-func (c *CodeMsgTmpl) Gen(w io.Writer) {
+func (c *CodeMsgTmpl) Gen(w io.Writer) error {
 	tpl := newFuncTemplate()
-	tpl.Execute(w, *c)
+
+	c.CodeTagName = stringy.New(c.CodeName).SnakeCase("?", "").ToLower()
+	c.MsgTagName = stringy.New(c.MsgName).SnakeCase("?", "").ToLower()
+	return tpl.Execute(w, *c)
 }

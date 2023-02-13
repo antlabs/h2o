@@ -14,8 +14,10 @@
 package codemsg
 
 import (
+	"bytes"
 	"fmt"
 	"go/ast"
+	"io"
 	"io/ioutil"
 	"log"
 	"os"
@@ -86,12 +88,13 @@ func (g *Generator) generateCodeMsg(c *CodeMsg, typeName string) {
 		log.Fatalf("no values defined for type %s", typeName)
 	}
 
-	tmpl := CodeMsgTmpl{AllVariable: values}
+	tmpl := CodeMsgTmpl{AllVariable: values, TypeName: typeName}
 	deepcopy.Copy(&tmpl, c).Do()
 	tmpl.Args = strings.Join(os.Args[2:], " ")
 	tmpl.PkgName = g.pkg.name
 
 	//tmpl.Gen(os.Stdout)
-	tmpl.Gen(&g.buf)
-	//io.Copy(os.Stdout, bytes.NewReader(g.buf.Bytes()))
+	if err := tmpl.Gen(&g.buf); err != nil {
+		io.Copy(os.Stdout, bytes.NewReader(g.buf.Bytes()))
+	}
 }

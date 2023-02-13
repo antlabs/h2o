@@ -87,17 +87,17 @@ import (
 )
 
 type CodeMsg struct {
-	TypeNames   string `clop:"--type" usage:"comma-separated list of type names; must be set" valid:"required"`
-	Output      string `clop:"long" usage:"output file name; default srcdir/<type>_string.go"`
-	Trimprefix  string `clop:"long" usage:"trim the 'prefix' from the generated constant names"`
-	Linecomment bool   `clop:"long" usage:"use line comment text as printed text when present"`
-	BuildTags   string `clop:"--tags" usage:"comma-separated list of build tags to apply"`
-	CodeMsg     bool   `clop:"long" usage:"turn on the ability to generate codemsg code"`
-	CodeMsgName string `clop:"long" usage:"turn on the ability to generate codemsg code" default:"CodeMsg"`
+	TypeNames         string `clop:"--type" usage:"comma-separated list of type names; must be set" valid:"required"`
+	Output            string `clop:"long" usage:"output file name; default srcdir/<type>_string.go"`
+	Trimprefix        string `clop:"long" usage:"trim the 'prefix' from the generated constant names"`
+	Linecomment       bool   `clop:"long" usage:"use line comment text as printed text when present"`
+	BuildTags         string `clop:"--tags" usage:"comma-separated list of build tags to apply"`
+	CodeMsg           bool   `clop:"long" usage:"turn on the ability to generate codemsg code"`
+	CodeMsgStructName string `clop:"long" usage:"turn on the ability to generate codemsg code" default:"CodeMsg"` //TODO
 
-	CodeName    string   `clop:"long" usage:"set new code name" default:"Code"`
-	MessageName string   `clop:"long" usage:"set new message name" default:"Message"`
-	Args        []string `clop:"args=file" usage:"file or dir" default:"["."]"`
+	CodeName string   `clop:"long" usage:"set new code name" default:"Code"`
+	MsgName  string   `clop:"long" usage:"set new message name" default:"Message"`
+	Args     []string `clop:"args=file" usage:"file or dir" default:"["."]"`
 }
 
 func genString(c *CodeMsg) {
@@ -329,6 +329,7 @@ func splitIntoRuns(values []Value) [][]Value {
 func (g *Generator) format() []byte {
 	src, err := format.Source(g.buf.Bytes())
 	if err != nil {
+		os.Stdout.Write(g.buf.Bytes())
 		// Should never happen, but can arise when developing this code.
 		// The user can compile the output to see the error.
 		log.Printf("warning: internal error: invalid Go generated: %s", err)

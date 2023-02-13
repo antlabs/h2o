@@ -5,6 +5,8 @@
 *.so
 *.dylib
 /h2o
+/testdata/errno_codemsg.go
+/testdata/errno_string.go
 
 # Test binary, built with `go test -c`
 *.test
