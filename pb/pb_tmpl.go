@@ -1,23 +1,14 @@
 package pb
 
 import (
+	_ "embed"
 	"io"
 	"text/template"
 )
 
-const (
-	pbTmpl = `syntax = "proto3";
-
-package {{.PackageName}};
-option go_package="{{.GoPackageName}}";
-
-{{- .PbType}}
-service {{.ServiceName}} {
-  {{- range $value := .Func}}
-  rpc {{.Name}} ({{.ReqName}}) returns ({{.RespName}});
-  {{- end}}
-}
-  `
+var (
+	//go:embed pb.tmpl
+	pbTmpl string
 )
 
 type PbTmpl struct {

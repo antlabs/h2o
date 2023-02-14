@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package {{.PackageName}};
+option go_package="{{.GoPackageName}}";
+
+{{- .PbType}}
+service {{.ServiceName}} {
+  {{- range $value := .Func}}
+  rpc {{.Name}} ({{.ReqName}}) returns ({{.RespName}});
+  {{- end}}
+}
+

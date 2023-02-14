@@ -1,0 +1,12 @@
+package {{.PackageName}}
+
+import(
+  "net/http"
+)
+
+func ({{.ReceiverName}} *{{.StructName}}) Init() {
+}
+
+func ({{.ReceiverName}} *{{.StructName}}) ModifyRequest(req *http.Request) (err error) {
+  return
+}
