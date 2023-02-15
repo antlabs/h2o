@@ -7,6 +7,15 @@ import (
   "encoding/json"
 )
 
+type CodeMsger interface {
+  SetCode(int)
+  SetMsg(string)
+  GetCode() int
+  GetMsg() string
+}
+
+var _ CodeMsger = (*{{.CodeMsgStructName}})(nil)
+
 type {{.CodeMsgStructName}} struct {
   {{.CodeName}}    {{.TypeName}} "json:\"{{.CodeTagName}}\"" 
   {{.MsgName}} string  "json:\"{{.MsgTagName}}\""
@@ -17,6 +26,22 @@ func (x *{{.CodeMsgStructName}}) Error() string {
   var b strings.Builder 
   b.Write(all) 
   return b.String()
+}
+
+func (x *{{.CodeMsgStructName}}) SetCode(code int) {
+  x.{{.CodeName}} = {{.TypeName}}(code)
+}
+
+func (x *{{.CodeMsgStructName}}) SetMsg(msg string) {
+  x.{{.MsgName}} = msg
+}
+
+func (x *{{.CodeMsgStructName}}) GetCode() int {
+  return int(x.{{.CodeName}})
+}
+
+func (x *{{.CodeMsgStructName}}) GetMsg() string {
+  return x.{{.MsgName}}
 }
 
 func New{{.CodeMsgStructName}}(code {{.TypeName}}) error {
