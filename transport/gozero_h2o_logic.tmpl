@@ -3,31 +3,31 @@ package {{.packageName}}
 import (
 	"context"
 
-	{{.imports}}
-
+  "github.com/antlabs/deepcopy"
+  pb{{.packageName}} "{{.gozeroBaseURL}}/{{.packageName}}"
+   "{{.httpClientBaseURL}}/{{.packageName}}"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type {{.logicName}} struct {
+type {{.structName}}Logic struct {
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 	logx.Logger
 }
 
-func New{{.logicName}}(ctx context.Context,svcCtx *svc.ServiceContext) *{{.logicName}} {
-	return &{{.logicName}}{
+func New{{.structName}}Logic(ctx context.Context,svcCtx *svc.ServiceContext) *{{.structName}} {
+	return &{{.structName}}{
 		ctx:    ctx,
 		svcCtx: svcCtx,
 		Logger: logx.WithContext(ctx),
 	}
 }
 
-
 {{- range $value := .Func}}
-{{if .hasComment}}{{.comment}}{{end}}
-func (l *{{.logicName}}) {{.method}} ({{if .hasReq}}in {{.request}}{{if .stream}},stream {{.streamBody}}{{end}}{{else}}stream {{.streamBody}}{{end}}) ({{if .hasReply}}{{.response}},{{end}} error) {
+func (l *{{.structName}}Logic) {{.structName}} (in *pb{{.packageName}}) ({{if .hasReply}}{{.response}},{{end}} error) {
 	// todo: add your logic here and delete this line
-	
+  var req {{.packageName}}.{{structName}}
+  {{.packageName}}
 	return {{if .hasReply}}&{{.responseType}}{},{{end}} nil
 }
 {{end}}

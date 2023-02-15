@@ -55,13 +55,18 @@ func genCodeMsg(c *CodeMsg) {
 		g.generateCodeMsg(c, typeName)
 	}
 
-	src := g.format()
+	saveFile(c, dir, g.format(), "_codemsg.go", types[0])
+	saveFile(c, dir, g.formatGrpc(), "_grpc_status.go", types[0])
+}
+
+func saveFile(c *CodeMsg, dir string, src []byte, suffix string, types string) {
 
 	outputName := c.Output
 	if outputName == "" {
-		baseName := fmt.Sprintf("%s_codemsg.go", types[0])
+		baseName := fmt.Sprintf("%s%s", types, suffix)
 		outputName = filepath.Join(dir, strings.ToLower(baseName))
 	}
+
 	err := ioutil.WriteFile(outputName, src, 0644)
 	if err != nil {
 		log.Fatalf("writing output: %s", err)
@@ -96,5 +101,17 @@ func (g *Generator) generateCodeMsg(c *CodeMsg, typeName string) {
 	//tmpl.Gen(os.Stdout)
 	if err := tmpl.Gen(&g.buf); err != nil {
 		io.Copy(os.Stdout, bytes.NewReader(g.buf.Bytes()))
+	}
+
+	if c.Grpc {
+
+		grpcTmpl := GrpcCodeMsgTmpl{AllVariable: values, TypeName: typeName}
+		deepcopy.Copy(&grpcTmpl, c).Do()
+		grpcTmpl.Args = strings.Join(os.Args[2:], " ")
+		grpcTmpl.PkgName = g.pkg.name
+
+		if err := grpcTmpl.Gen(&g.grpcBuf); err != nil {
+			io.Copy(os.Stdout, bytes.NewReader(g.grpcBuf.Bytes()))
+		}
 	}
 }

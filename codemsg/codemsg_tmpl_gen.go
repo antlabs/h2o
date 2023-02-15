@@ -11,6 +11,7 @@ import (
 //go:embed codemsg.tmpl
 var codemsgTmpl string
 
+// 自定义
 type CodeMsgTmpl struct {
 	PkgName           string // 包名
 	TypeName          string

@@ -18,6 +18,8 @@ muilt:
   req:
     method: POST
     url: https://{{.Host}}/{{.Org_name}}/{{.App_name}}/token
+    template: 
+      url: true
     # 直接使用配置文件里面的值
     useDefault:
       header:

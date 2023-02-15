@@ -6,11 +6,11 @@
 go install github.com/antlabs/h2o/cmd/h2o@latest
 ```
 ## 命令行
-* codemsg 用于生成错误码相关代码
-* http 生成http client 和http server(代码)
-* jsonstruct 字符串转golang struct定义
-* yamlstruct 字符串转golang struct定义
-
+* codemsg: 用于生成错误码相关代码
+* http: 生成http client 和http server(代码)
+* jsonstruct: 字符串转golang struct定义
+* yamlstruct: 字符串转golang struct定义
+* pb: dsl生成protobuf定义
 ```
 Usage:
     ./h2o [Options] <Subcommand>
@@ -22,8 +22,8 @@ Subcommand:
     codemsg       Generate code in codemsg format from constants
     http          gen http code
     jsonstruct    Generate structure from json
+    pb            gen protobuf code
     yamlstruct    Generate structure from yaml
-
 ```
 ## json 子命令
 ```bash

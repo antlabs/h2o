@@ -1,6 +1,6 @@
 build:
 	go build ./cmd/h2o/h2o.go
-	./h2o codemsg --code-msg --linecomment --type ErrNo ./testdata/err.go
+	./h2o codemsg --code-msg --linecomment --grpc --type ErrNo ./testdata/err.go
 
 
 # 忽略

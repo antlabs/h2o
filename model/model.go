@@ -56,7 +56,6 @@ func (m *Muilt) GetRespName() string {
 		return m.Handler + "Resp"
 	}
 	return m.Resp.Name
-
 }
 
 type UseDefault struct {
@@ -66,6 +65,10 @@ type UseDefault struct {
 
 type Encode struct {
 	Body string `yaml:"body"`
+}
+
+type Template struct {
+	URL bool `yaml:"url"`
 }
 
 type Req struct {

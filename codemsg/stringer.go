@@ -93,6 +93,7 @@ type CodeMsg struct {
 	Linecomment       bool   `clop:"long" usage:"use line comment text as printed text when present"`
 	BuildTags         string `clop:"--tags" usage:"comma-separated list of build tags to apply"`
 	CodeMsg           bool   `clop:"long" usage:"turn on the ability to generate codemsg code"`
+	Grpc              bool   `clop:"long" usage:"Generate grpc error type"`
 	CodeMsgStructName string `clop:"long" usage:"turn on the ability to generate codemsg code" default:"CodeMsg"` //TODO
 
 	CodeName string   `clop:"long" usage:"set new code name" default:"Code"`
@@ -171,8 +172,9 @@ func isDirectory(name string) bool {
 // Generator holds the state of the analysis. Primarily used to buffer
 // the output for format.Source.
 type Generator struct {
-	buf bytes.Buffer // Accumulated output.
-	pkg *Package     // Package we are scanning.
+	buf     bytes.Buffer // Accumulated output.
+	grpcBuf bytes.Buffer
+	pkg     *Package // Package we are scanning.
 
 	trimPrefix  string
 	lineComment bool
@@ -323,6 +325,19 @@ func splitIntoRuns(values []Value) [][]Value {
 		values = values[i:]
 	}
 	return runs
+}
+
+func (g *Generator) formatGrpc() []byte {
+	src, err := format.Source(g.grpcBuf.Bytes())
+	if err != nil {
+		os.Stdout.Write(g.grpcBuf.Bytes())
+		// Should never happen, but can arise when developing this code.
+		// The user can compile the output to see the error.
+		log.Printf("warning: internal error: invalid Go generated: %s", err)
+		log.Printf("warning: compile the package to analyze the error")
+		return g.grpcBuf.Bytes()
+	}
+	return src
 }
 
 // format returns the gofmt-ed contents of the Generator's buffer.
