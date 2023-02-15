@@ -67,6 +67,15 @@ import (
 	"strings"
 )
 
+type CodeMsger interface {
+	SetCode(int)
+	SetMsg(string)
+	GetCode() int
+	GetMsg() string
+}
+
+var _ CodeMsger = (*CodeMsg)(nil)
+
 type CodeMsg struct {
 	Code    ErrNo  "json:\"code\""
 	Message string "json:\"message\""
@@ -77,6 +86,22 @@ func (x *CodeMsg) Error() string {
 	var b strings.Builder
 	b.Write(all)
 	return b.String()
+}
+
+func (x *CodeMsg) SetCode(code int) {
+	x.Code = ErrNo(code)
+}
+
+func (x *CodeMsg) SetMsg(msg string) {
+	x.Message = msg
+}
+
+func (x *CodeMsg) GetCode() int {
+	return int(x.Code)
+}
+
+func (x *CodeMsg) GetMsg() string {
+	return x.Message
 }
 
 func NewCodeMsg(code ErrNo) error {
@@ -92,7 +117,6 @@ var (
 	ErrCodeMsgENotFound error = NewCodeMsg(ENotFound) //找不到
 
 )
-
 ```
 ```bash
 h2o codemsg --code-msg --linecomment --type ErrNo ./err.go
