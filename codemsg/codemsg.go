@@ -56,7 +56,9 @@ func genCodeMsg(c *CodeMsg) {
 	}
 
 	saveFile(c, dir, g.format(), "_codemsg.go", types[0])
-	saveFile(c, dir, g.formatGrpc(), "_grpc_status.go", types[0])
+	if c.Grpc {
+		saveFile(c, dir, g.formatGrpc(), "_grpc_status.go", types[0])
+	}
 }
 
 func saveFile(c *CodeMsg, dir string, src []byte, suffix string, types string) {
