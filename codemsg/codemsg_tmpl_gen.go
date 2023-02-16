@@ -13,6 +13,7 @@ var codemsgTmpl string
 
 // 自定义
 type CodeMsgTmpl struct {
+	StringMethod      string // String方法的名字，默认String
 	PkgName           string // 包名
 	TypeName          string
 	CodeMsgStructName string // CodeMsg{Code int, Message string} 结构体的名字

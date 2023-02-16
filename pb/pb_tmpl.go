@@ -12,17 +12,17 @@ var (
 )
 
 type PbTmpl struct {
-	PackageName   string
-	GoPackageName string
-	ServiceName   string
-	Func          []Func
+	PackageName   string //protobuf 文件中的package
+	GoPackageName string //protobuf 文件中的go_papckage
+	ServiceName   string //protobuf 里面的rcp ServiceName(请求) returns(响应);
+	Func          []Func //
 	PbType        string //这里面都是类型定义
 }
 
 type Func struct {
-	Name     string
-	ReqName  string
-	RespName string
+	Name     string //service名
+	ReqName  string //service 请求参数名
+	RespName string //service 响应参数名
 }
 
 func newFuncTemplate() *template.Template {

@@ -119,5 +119,6 @@ var (
 )
 ```
 ```bash
-h2o codemsg --code-msg --linecomment --type ErrNo ./err.go
+./h2o codemsg --code-msg --linecomment --string --type ErrNo ./testdata/err.go
+// 如果要修改生成的String方法名， 可以通过--string-method String2  选项
 ```

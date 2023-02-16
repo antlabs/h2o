@@ -76,7 +76,6 @@ import (
 	"go/format"
 	"go/token"
 	"go/types"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -94,6 +93,8 @@ type CodeMsg struct {
 	BuildTags         string `clop:"--tags" usage:"comma-separated list of build tags to apply"`
 	CodeMsg           bool   `clop:"long" usage:"turn on the ability to generate codemsg code"`
 	Grpc              bool   `clop:"long" usage:"Generate grpc error type"`
+	StringMethod      string `clop:"long" usage:"String function name" default:"String"`
+	String            bool   `clop:"long" usage:"Generate string function"`
 	CodeMsgStructName string `clop:"long" usage:"turn on the ability to generate codemsg code" default:"CodeMsg"` //TODO
 
 	CodeName string   `clop:"long" usage:"set new code name" default:"Code"`
@@ -142,21 +143,13 @@ func genString(c *CodeMsg) {
 
 	// Run generate for each type.
 	for _, typeName := range types {
-		g.generate(typeName)
+		g.generate(typeName, c)
 	}
 
 	// Format the output.
-	src := g.format()
 
-	// Write to file.
-	outputName := c.Output
-	if outputName == "" {
-		baseName := fmt.Sprintf("%s_string.go", types[0])
-		outputName = filepath.Join(dir, strings.ToLower(baseName))
-	}
-	err := ioutil.WriteFile(outputName, src, 0644)
-	if err != nil {
-		log.Fatalf("writing output: %s", err)
+	if c.String {
+		saveFile(c, dir, g.format(), "_string.go", types[0])
 	}
 }
 
@@ -245,7 +238,7 @@ func (g *Generator) addPackage(pkg *packages.Package) {
 }
 
 // generate produces the String method for the named type.
-func (g *Generator) generate(typeName string) {
+func (g *Generator) generate(typeName string, c *CodeMsg) {
 
 	values := make([]Value, 0, 100)
 
@@ -273,26 +266,7 @@ func (g *Generator) generate(typeName string) {
 	}
 	g.Printf("}\n")
 	runs := splitIntoRuns(values)
-	// The decision of which pattern to use depends on the number of
-	// runs in the numbers. If there's only one, it's easy. For more than
-	// one, there's a tradeoff between complexity and size of the data
-	// and code vs. the simplicity of a map. A map takes more space,
-	// but so does the code. The decision here (crossover at 10) is
-	// arbitrary, but considers that for large numbers of runs the cost
-	// of the linear scan in the switch might become important, and
-	// rather than use yet another algorithm such as binary search,
-	// we punt and use a map. In any case, the likelihood of a map
-	// being necessary for any realistic example other than bitmasks
-	// is very low. And bitmasks probably deserve their own analysis,
-	// to be done some other day.
-	switch {
-	case len(runs) == 1:
-		g.buildOneRun(runs, typeName)
-	case len(runs) <= 10:
-		g.buildMultipleRuns(runs, typeName)
-	default:
-		g.buildMap(runs, typeName)
-	}
+	g.buildMap(runs, typeName, c)
 }
 
 // splitIntoRuns breaks the values into runs of contiguous sequences.
@@ -565,86 +539,9 @@ func (g *Generator) declareNameVars(runs [][]Value, typeName string, suffix stri
 	g.Printf("\"\n")
 }
 
-// buildOneRun generates the variables and String method for a single run of contiguous values.
-func (g *Generator) buildOneRun(runs [][]Value, typeName string) {
-	values := runs[0]
-	g.Printf("\n")
-	g.declareIndexAndNameVar(values, typeName)
-	// The generated code is simple enough to write as a Printf format.
-	lessThanZero := ""
-	if values[0].signed {
-		lessThanZero = "i < 0 || "
-	}
-	if values[0].value == 0 { // Signed or unsigned, 0 is still 0.
-		g.Printf(stringOneRun, typeName, usize(len(values)), lessThanZero)
-	} else {
-		g.Printf(stringOneRunWithOffset, typeName, values[0].String(), usize(len(values)), lessThanZero)
-	}
-}
-
-// Arguments to format are:
-//
-//	[1]: type name
-//	[2]: size of index element (8 for uint8 etc.)
-//	[3]: less than zero check (for signed types)
-const stringOneRun = `func (i %[1]s) String() string {
-	if %[3]si >= %[1]s(len(_%[1]s_index)-1) {
-		return "%[1]s(" + strconv.FormatInt(int64(i), 10) + ")"
-	}
-	return _%[1]s_name[_%[1]s_index[i]:_%[1]s_index[i+1]]
-}
-`
-
-// Arguments to format are:
-//	[1]: type name
-//	[2]: lowest defined value for type, as a string
-//	[3]: size of index element (8 for uint8 etc.)
-//	[4]: less than zero check (for signed types)
-/*
- */
-const stringOneRunWithOffset = `func (i %[1]s) String() string {
-	i -= %[2]s
-	if %[4]si >= %[1]s(len(_%[1]s_index)-1) {
-		return "%[1]s(" + strconv.FormatInt(int64(i + %[2]s), 10) + ")"
-	}
-	return _%[1]s_name[_%[1]s_index[i] : _%[1]s_index[i+1]]
-}
-`
-
-// buildMultipleRuns generates the variables and String method for multiple runs of contiguous values.
-// For this pattern, a single Printf format won't do.
-func (g *Generator) buildMultipleRuns(runs [][]Value, typeName string) {
-	g.Printf("\n")
-	g.declareIndexAndNameVars(runs, typeName)
-	g.Printf("func (i %s) String() string {\n", typeName)
-	g.Printf("\tswitch {\n")
-	for i, values := range runs {
-		if len(values) == 1 {
-			g.Printf("\tcase i == %s:\n", &values[0])
-			g.Printf("\t\treturn _%s_name_%d\n", typeName, i)
-			continue
-		}
-		if values[0].value == 0 && !values[0].signed {
-			// For an unsigned lower bound of 0, "0 <= i" would be redundant.
-			g.Printf("\tcase i <= %s:\n", &values[len(values)-1])
-		} else {
-			g.Printf("\tcase %s <= i && i <= %s:\n", &values[0], &values[len(values)-1])
-		}
-		if values[0].value != 0 {
-			g.Printf("\t\ti -= %s\n", &values[0])
-		}
-		g.Printf("\t\treturn _%s_name_%d[_%s_index_%d[i]:_%s_index_%d[i+1]]\n",
-			typeName, i, typeName, i, typeName, i)
-	}
-	g.Printf("\tdefault:\n")
-	g.Printf("\t\treturn \"%s(\" + strconv.FormatInt(int64(i), 10) + \")\"\n", typeName)
-	g.Printf("\t}\n")
-	g.Printf("}\n")
-}
-
 // buildMap handles the case where the space is so sparse a map is a reasonable fallback.
 // It's a rare situation but has simple code.
-func (g *Generator) buildMap(runs [][]Value, typeName string) {
+func (g *Generator) buildMap(runs [][]Value, typeName string, c *CodeMsg) {
 	g.Printf("\n")
 	g.declareNameVars(runs, typeName, "")
 	g.Printf("\nvar _%s_map = map[%s]string{\n", typeName, typeName)
@@ -656,11 +553,11 @@ func (g *Generator) buildMap(runs [][]Value, typeName string) {
 		}
 	}
 	g.Printf("}\n\n")
-	g.Printf(stringMap, typeName)
+	g.Printf(stringMap, typeName, c.StringMethod)
 }
 
 // Argument to format is the type name.
-const stringMap = `func (i %[1]s) String() string {
+const stringMap = `func (i %[1]s) %[2]s() string {
 	if str, ok := _%[1]s_map[i]; ok {
 		return str
 	}

@@ -28,6 +28,7 @@ type ClientTmpl struct {
 
 type Func struct {
 	URL          string //url 地址
+	URLTemplate  bool   //url 启用模板语法
 	Method       string //http方法 GET POST DELETE之类的
 	DefReqHeader []model.KeyVal[string, string]
 	DefReqBody   []model.KeyVal[string, string]

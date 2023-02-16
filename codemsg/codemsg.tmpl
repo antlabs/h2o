@@ -47,7 +47,7 @@ func (x *{{.CodeMsgStructName}}) GetMsg() string {
 func New{{.CodeMsgStructName}}(code {{.TypeName}}) error {
   return &CodeMsg{
     {{.CodeName}}: code,
-    {{.MsgName}}: code.String(),
+    {{.MsgName}}: code.{{.StringMethod}}(),
   }
 }
 

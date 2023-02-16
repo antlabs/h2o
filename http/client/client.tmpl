@@ -27,6 +27,7 @@ func New() *{{.StructName}} {
 {{- $ReceiverName := .ReceiverName}}
 {{- $StructName := .StructName}}
 {{- range $key, $value := .InitField}}
+
 func ({{$ReceiverName}} *{{$StructName}}) Set{{$key}} ({{$key}} string) *{{$StructName}} {
   {{$ReceiverName}}.{{$key}} = {{$key}}
   return {{$ReceiverName}} 
@@ -83,7 +84,7 @@ func ({{$ReceiverName}} *{{$StructName}}) {{$value.HandlerName}}Ctx(ctx context.
   {{- end}}
 
   code := 0
-  err := gout.{{.Method}}({{$value.URL|printf "%q"}}, *{{$ReceiverName}}).
+  err := gout.{{.Method}}({{$value.URL|printf "%q"}}{{if $value.URLTemplate}}, *{{$ReceiverName}}{{end}}).
   RequestUse({{$ReceiverName}})
   {{- if .HaveHeader}}.
   SetHeader(req.Header)

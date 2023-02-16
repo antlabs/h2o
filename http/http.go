@@ -106,6 +106,7 @@ func (h *HTTP) SubMain() {
 				HandlerName:  handler,
 				Method:       h.Req.Method,
 				URL:          h.Req.URL,
+				URLTemplate:  h.Req.Template.URL,
 				ReqName:      h.Req.Name,
 				RespName:     h.Resp.Name,
 				DefReqHeader: defReqHeader,

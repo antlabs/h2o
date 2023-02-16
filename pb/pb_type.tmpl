@@ -1,12 +1,14 @@
 {{range $value := .ReqResp}}
 // 请求包
 message {{$value.Req.Name}} {
+{{- if $value.Req.URL.Name}}
+    {{$value.Req.URL.Name}} URL = 1; {{end}}
 {{- if $value.Req.Query.Name}}
-    {{$value.Req.Query.Name}} Query = 1; {{end}}
+    {{$value.Req.Query.Name}} Query = 2; {{end}}
 {{- if $value.Req.Header.Name}}
-    {{$value.Req.Header.Name}} Header = 2;{{end}}
+    {{$value.Req.Header.Name}} Header = 3;{{end}}
 {{- if $value.Req.Body.Name }}
-    {{$value.Req.Body.Name}} Body = 3; {{end}}
+    {{$value.Req.Body.Name}} Body = 4; {{end}}
 }
 
 // 响应包

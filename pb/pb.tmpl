@@ -3,6 +3,12 @@ syntax = "proto3";
 package {{.PackageName}};
 option go_package="{{.GoPackageName}}";
 
+message {{.StructName}} struct {
+  {{- range $key, $value := .InitField}}
+    string {{.$value}} = {{.$key}};
+  {{- end}}
+}
+
 {{- .PbType}}
 service {{.ServiceName}} {
   {{- range $value := .Func}}

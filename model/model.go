@@ -74,6 +74,7 @@ type Template struct {
 type Req struct {
 	Encode          Encode            `yaml:"encode"`
 	URL             string            `yaml:"url"`
+	Template        Template          `yaml:"template"`
 	Name            string            `yaml:"name"`
 	NewType         map[string]string `yaml:"newType"`
 	NewProtobufType map[string]string `yaml:"newProtobufType"`
