@@ -19,7 +19,16 @@ func newTypeTemplate() *template.Template {
 	return template.Must(template.New("h2o-pb-type-tmpl").Parse(tmpl))
 }
 
-func Gen(t *pyaml.TypeTmpl, w io.Writer) {
+type pbType struct {
+	pyaml.TypeTmpl
+	URLName string
+}
+
+func newPbType(pt pyaml.TypeTmpl, urlname string) *pbType {
+	return &pbType{TypeTmpl: pt, URLName: urlname}
+}
+
+func (p *pbType) Gen(w io.Writer) {
 	tpl := newTypeTemplate()
-	tpl.Execute(w, *t)
+	tpl.Execute(w, *p)
 }

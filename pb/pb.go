@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 
+	"github.com/antlabs/gstl/mapex"
 	"github.com/antlabs/h2o/internal/save"
 	"github.com/antlabs/h2o/parser"
 	"github.com/antlabs/h2o/pyaml"
@@ -27,7 +28,8 @@ func (b *Pb) SubMain() {
 			return
 		}
 
-		tmplType := pyaml.TypeTmpl{PackageName: c.Package}
+		urlName := c.Init.Resp.Name + "URL"
+		tmplType := newPbType(pyaml.TypeTmpl{PackageName: c.Package}, urlName)
 
 		packageName := c.Package
 		if c.Protobuf.Package != "" {
@@ -39,7 +41,13 @@ func (b *Pb) SubMain() {
 			goPackageName = c.Protobuf.GoPackage
 		}
 
-		tmplPb := PbTmpl{GoPackageName: goPackageName, PackageName: packageName, ServiceName: c.Package}
+		tmplPb := PbTmpl{
+			GoPackageName: goPackageName,
+			PackageName:   packageName, ServiceName: c.Package,
+			URLField: mapex.SortKeys(c.Init.Resp.Field),
+			URLName:  urlName,
+		}
+
 		for _, h := range c.Muilt {
 
 			h.ModifyHandler()
@@ -72,7 +80,7 @@ func (b *Pb) SubMain() {
 			})
 
 			var typeOut bytes.Buffer
-			Gen(&tmplType, &typeOut)
+			tmplType.Gen(&typeOut)
 			tmplPb.PbType = typeOut.String()
 			tmplPb.Func = append(tmplPb.Func, Func{Name: h.Handler, ReqName: h.Req.Name, RespName: h.Resp.Name})
 

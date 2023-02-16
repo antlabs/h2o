@@ -3,9 +3,9 @@ syntax = "proto3";
 package {{.PackageName}};
 option go_package="{{.GoPackageName}}";
 
-message {{.StructName}} struct {
-  {{- range $key, $value := .InitField}}
-    string {{.$value}} = {{.$key}};
+message {{.URLName}} {
+  {{- range $key, $value := .URLField}}
+    string {{$value}} = {{$key|add1}};
   {{- end}}
 }
 

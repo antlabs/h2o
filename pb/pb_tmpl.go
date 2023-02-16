@@ -4,6 +4,8 @@ import (
 	_ "embed"
 	"io"
 	"text/template"
+
+	"github.com/Masterminds/sprig/v3"
 )
 
 var (
@@ -12,6 +14,9 @@ var (
 )
 
 type PbTmpl struct {
+	URLField []string //url字段名
+	URLName  string   //url message名字
+
 	PackageName   string //protobuf 文件中的package
 	GoPackageName string //protobuf 文件中的go_papckage
 	ServiceName   string //protobuf 里面的rcp ServiceName(请求) returns(响应);
@@ -27,7 +32,7 @@ type Func struct {
 
 func newFuncTemplate() *template.Template {
 	tmpl := pbTmpl
-	return template.Must(template.New("h2o-pb-tmpl").Parse(tmpl))
+	return template.Must(template.New("h2o-pb-tmpl").Funcs(sprig.FuncMap()).Parse(tmpl))
 }
 
 func (p *PbTmpl) Gen(w io.Writer) error {

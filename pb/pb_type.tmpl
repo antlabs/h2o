@@ -1,8 +1,9 @@
+{{- $URLName := .URLName}}
 {{range $value := .ReqResp}}
 // 请求包
 message {{$value.Req.Name}} {
-{{- if $value.Req.URL.Name}}
-    {{$value.Req.URL.Name}} URL = 1; {{end}}
+{{- if $URLName}}
+    {{$URLName}} URL = 1; {{end}}
 {{- if $value.Req.Query.Name}}
     {{$value.Req.Query.Name}} Query = 2; {{end}}
 {{- if $value.Req.Header.Name}}
