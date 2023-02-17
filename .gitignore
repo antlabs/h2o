@@ -8,6 +8,7 @@
 /testdata/errno_codemsg.go
 /testdata/errno_string.go
 /testdata/errno_grpc_status.go
+/internal/logic/
 
 # Test binary, built with `go test -c`
 *.test
