@@ -81,5 +81,5 @@ func getLogicName(dir string, packageName string, handler string) string {
 	prefix := fmt.Sprintf("%s/internal/logic/%s/%s", dir, packageName, handler)
 
 	os.MkdirAll(prefix, 0755)
-	return fmt.Sprintf("%s/%s", prefix, handler)
+	return fmt.Sprintf("%s/%s.go", prefix, handler)
 }
