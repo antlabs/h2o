@@ -57,6 +57,7 @@ func (t *Transport) SubMain() {
 			if t.FromType == goZero && t.ToType == httpClient {
 
 				tmpl := transportGoZeroHTTPClientTmpl{
+					URLStruct:         c.Init.Resp.Name,
 					PackageName:       c.Package,
 					GoZeroBaseURL:     t.FromBaseURL,
 					HTTPClientBaseURL: t.ToBaseURL}
@@ -73,7 +74,6 @@ func (t *Transport) SubMain() {
 				})
 			}
 		}
-
 	}
 }
 

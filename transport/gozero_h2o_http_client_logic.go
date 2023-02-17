@@ -14,6 +14,7 @@ var (
 
 type transportGoZeroHTTPClientTmpl struct {
 	PackageName       string //包名
+	URLStruct         string //请求体名
 	GoZeroBaseURL     string //
 	HTTPClientBaseURL string //
 	Func              Func   //func
