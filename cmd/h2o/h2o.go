@@ -8,6 +8,7 @@ import (
 	"github.com/antlabs/h2o/codemsg"
 	"github.com/antlabs/h2o/http"
 	"github.com/antlabs/h2o/pb"
+	"github.com/antlabs/h2o/transport"
 	"github.com/antlabs/tostruct/json"
 	"github.com/antlabs/tostruct/option"
 	"github.com/antlabs/tostruct/yaml"
@@ -77,6 +78,8 @@ type H2O struct {
 	HTTP http.HTTP `clop:"subcommand" usage:"gen http code"`
 	//子命令，生成protobuf
 	PB pb.Pb `clop:"subcommand" usage:"gen protobuf code"`
+	//transport
+	Transport transport.Transport `clop:"subcommand" usage:"transport"`
 }
 
 func main() {

@@ -25,7 +25,7 @@ type PbTmpl struct {
 }
 
 type Func struct {
-	Name     string //service名
+	RpcName  string //service名
 	ReqName  string //service 请求参数名
 	RespName string //service 响应参数名
 }

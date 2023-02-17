@@ -12,7 +12,7 @@ message {{.URLName}} {
 {{- .PbType}}
 service {{.ServiceName}} {
   {{- range $value := .Func}}
-  rpc {{.Name}} ({{.ReqName}}) returns ({{.RespName}});
+  rpc {{.RpcName}} ({{.ReqName}}) returns ({{.RespName}});
   {{- end}}
 }
 

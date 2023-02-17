@@ -82,7 +82,7 @@ func (b *Pb) SubMain() {
 			var typeOut bytes.Buffer
 			tmplType.Gen(&typeOut)
 			tmplPb.PbType = typeOut.String()
-			tmplPb.Func = append(tmplPb.Func, Func{Name: h.Handler, ReqName: h.Req.Name, RespName: h.Resp.Name})
+			tmplPb.Func = append(tmplPb.Func, Func{RpcName: h.Handler, ReqName: h.Req.Name, RespName: h.Resp.Name})
 
 		}
 
