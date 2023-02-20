@@ -14,6 +14,11 @@ const (
 	httpClient = "h2o-http-client"
 )
 
+var (
+	spaceBytes = []byte(" ")
+	lineBytes  = []byte("\n")
+)
+
 // 这是主模块
 // TransportTmpl模块，就是选用一种服务端接入数据，然后选用一种客户端把数据发走
 type Transport struct {
@@ -31,9 +36,29 @@ type Transport struct {
 	Dir string `clop:"short;long" usage:"gen dir" default:"."`
 }
 
+func (t *Transport) getGoModuleName() string {
+	all, err := os.ReadFile(t.Dir + "/go.mod")
+	if err != nil {
+		panic(err.Error())
+	}
+
+	start := bytes.Index(all, spaceBytes)
+	if start == -1 {
+		panic("not found space")
+	}
+
+	end := bytes.Index(all, lineBytes)
+	if end == -1 {
+		panic(`not found \n`)
+	}
+
+	return string(all[start+1 : end])
+}
+
 // 入口
 func (t *Transport) SubMain() {
 
+	gomod := t.getGoModuleName()
 	for _, f := range t.File {
 
 		//var out bytes.Buffer
@@ -57,6 +82,7 @@ func (t *Transport) SubMain() {
 			if t.FromType == goZero && t.ToType == httpClient {
 
 				tmpl := transportGoZeroHTTPClientTmpl{
+					SvcName:           gomod + "/internal/svc",
 					URLStruct:         c.Init.Resp.Name,
 					PackageName:       c.Package,
 					GoZeroBaseURL:     t.FromBaseURL,

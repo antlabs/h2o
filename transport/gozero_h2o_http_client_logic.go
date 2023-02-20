@@ -13,6 +13,7 @@ var (
 )
 
 type transportGoZeroHTTPClientTmpl struct {
+	SvcName           string
 	PackageName       string //包名
 	URLStruct         string //请求体名
 	GoZeroBaseURL     string //

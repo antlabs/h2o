@@ -84,8 +84,9 @@ func ({{$ReceiverName}} *{{$StructName}}) {{$value.HandlerName}}Ctx(ctx context.
   {{- end}}
 
   code := 0
+  badBody := ""
   err := gout.{{.Method}}({{$value.URL|printf "%q"}}{{if $value.URLTemplate}}, *{{$ReceiverName}}{{end}}).
-  RequestUse({{$ReceiverName}})
+  RequestUse({{$ReceiverName}}). //请求中件间，调用ModifyRequest函数
   {{- if .HaveHeader}}.
   SetHeader(req.Header)
   {{- end}}{{- if .HaveQuery}}.
@@ -96,15 +97,24 @@ func ({{$ReceiverName}} *{{$StructName}}) {{$value.HandlerName}}Ctx(ctx context.
   SetJSON(req.Body)
   {{- end}}{{end}}.
   WithContext(ctx).
-  BindJSON(&resp.Body).
-  Code(&code).
+  Callback(func(c *gout.Context) (err error) {
+
+    switch {
+    case c.Code >= 200 && c.Code <= 299: //http code为200-299范围内认为是正确
+      c.BindJSON(&resp.Body)
+    default: //http code不是200时
+      c.BindBody(&badBody)
+    }
+    code = c.Code
+    return nil
+  }).
   Do()
   if err != nil {
     return nil,err
   }
 
   if code != 200 {
-    return nil, fmt.Errorf("{{$value.HandlerName}} code(%d) != 200", code)
+    return nil, fmt.Errorf("{{$value.HandlerName}} code(%d) != 200, badbody(%s)", code, badBody)
   }
   return &resp, nil
 }

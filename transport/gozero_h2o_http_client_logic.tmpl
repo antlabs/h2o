@@ -1,7 +1,8 @@
-package {{.PackageName}}
+package {{.PackageName}}logic
 
 import (
 	"context"
+  "{{.SvcName}}"
 
   "github.com/antlabs/deepcopy"
   "{{.GoZeroBaseURL}}/{{.PackageName}}"
@@ -28,16 +29,16 @@ func New{{$RpcName}}Logic(ctx context.Context,svcCtx *svc.ServiceContext) *{{$Rp
 
 func (l *{{$RpcName}}Logic) {{$RpcName}} (in *{{.PackageName}}.{{$ReqName}}) (*{{.PackageName}}.{{$RespName}}, error) {
   var req hc{{.PackageName}}.{{$RpcName}}Req
-  var url {{.PackageName}}.{{.URLStruct}}
+  var url hc{{.PackageName}}.{{.URLStruct}}
   deepcopy.Copy(&url, &in.URL).Do()
   deepcopy.Copy(&req, in).Do()
-  resp, err := {{.PackageName}}.{{$RpcName}}Ctx(req)
+  resp, err := url.{{$RpcName}}Ctx(l.ctx, &req)
   if err != nil {
     return nil, err
   }
 
-  var out {{.PackageName}}.{{$RespName}}Resp
+  var out {{.PackageName}}.{{$RespName}}
   deepcopy.Copy(&out, resp).Do()
-	return out, nil
+	return &out, nil
 }
 
