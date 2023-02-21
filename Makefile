@@ -1,6 +1,10 @@
 build:
 	go build ./cmd/h2o/h2o.go
 
+test:
+	go test ./...
+
+# codemsg测试
 codemsg:
 	go build ./cmd/h2o/h2o.go
 	- rm ./testdata/errno_string.go
@@ -14,7 +18,7 @@ protoc:
 	./h2o pb -f ./testdata/usertoken.yaml
 	cat ./usertoken/usertoken.proto
 
-# 忽略
+# 忽略, 更新本地h2o文件，方便自测用的
 update:
 	make
 	rm ~/go/bin/h2o

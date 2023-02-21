@@ -1,0 +1,46 @@
+package main
+
+import (
+	"flag"
+	"fmt"
+
+	"im-admin/internal/config"
+  {{$GoModName := .GoModName}}
+  {{- range $PackageName := .PackageNameSlice}}
+  {{- $PackageName}}Server "{{$GoModName}}/internal/server/{{$PackageName}}"
+  {{end}}
+	"{{.GoModName}}/internal/svc"
+
+	"github.com/zeromicro/go-zero/core/conf"
+	"github.com/zeromicro/go-zero/core/service"
+	"github.com/zeromicro/go-zero/zrpc"
+  {{$GoZeroBaseURL := .GoZeroBaseURL}}
+  {{- range $PackageName := .PackageNameSlice}}
+  "{{$GoZeroBaseURL}}/{{$PackageName}}" {{end}}
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
+)
+
+var configFile = flag.String("f", "etc/{{.GoModName}}.yaml", "the config file")
+
+func main() {
+	flag.Parse()
+
+	var c config.Config
+	conf.MustLoad(*configFile, &c)
+	ctx := svc.NewServiceContext(c)
+
+	s := zrpc.MustNewServer(c.RpcServerConf, func(grpcServer *grpc.Server) {
+    {{range $PackageName := .PackageNameSlice}}
+    {{- $PackageName}}.Register{{title $PackageName }}Server(grpcServer, {{$PackageName}}Server.New{{title $PackageName}}Server(ctx))
+    {{end}}
+
+		if c.Mode == service.DevMode || c.Mode == service.TestMode {
+			reflection.Register(grpcServer)
+		}
+	})
+	defer s.Stop()
+
+	fmt.Printf("Starting rpc server at %s...\n", c.ListenOn)
+	s.Start()
+}

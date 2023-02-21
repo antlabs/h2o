@@ -29,7 +29,7 @@ func New{{$RpcName}}Logic(ctx context.Context,svcCtx *svc.ServiceContext) *{{$Rp
 
 func (l *{{$RpcName}}Logic) {{$RpcName}} (in *{{.PackageName}}.{{$ReqName}}) (*{{.PackageName}}.{{$RespName}}, error) {
   var req hc{{.PackageName}}.{{$RpcName}}Req
-  var url hc{{.PackageName}}.{{.URLStruct}}
+  url := hc{{.PackageName}}.New()
   deepcopy.Copy(&url, &in.URL).Do()
   deepcopy.Copy(&req, in).Do()
   resp, err := url.{{$RpcName}}Ctx(l.ctx, &req)

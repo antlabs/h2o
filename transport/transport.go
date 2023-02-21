@@ -59,6 +59,8 @@ func (t *Transport) getGoModuleName() string {
 func (t *Transport) SubMain() {
 
 	gomod := t.getGoModuleName()
+	tmplMain := goZeroMain{GoModName: gomod, GoZeroBaseURL: t.FromBaseURL}
+	tmplServer := goZeroServer{GoZeroBaseURL: t.FromBaseURL, GoModName: gomod}
 	for _, f := range t.File {
 
 		//var out bytes.Buffer
@@ -68,6 +70,8 @@ func (t *Transport) SubMain() {
 			return
 		}
 
+		tmplMain.PackageNameSlice = append(tmplMain.PackageNameSlice, c.Package)
+		tmplServer.PackageName = c.Package
 		for _, h := range c.Muilt {
 
 			h.ModifyHandler()
@@ -93,6 +97,8 @@ func (t *Transport) SubMain() {
 					ReqName:  h.Req.Name,
 					RespName: h.Resp.Name}
 
+				tmplServer.Func = append(tmplServer.Func, tmpl.Func)
+
 				save.TmplFile(getLogicName(t.Dir, c.Package, h.Handler), true, func() []byte {
 					var typeBuf bytes.Buffer
 					tmpl.Gen(&typeBuf)
@@ -100,7 +106,28 @@ func (t *Transport) SubMain() {
 				})
 			}
 		}
+		save.TmplFile(getServerName(t.Dir, tmplServer.PackageName), true, func() []byte {
+			var typeBuf bytes.Buffer
+			tmplServer.Gen(&typeBuf)
+			return typeBuf.Bytes()
+		})
+		tmplServer.Func = nil
 	}
+
+	// 生成main.go
+	save.TmplFile(getMainName(t.Dir, gomod), true, func() []byte {
+		var typeBuf bytes.Buffer
+		tmplMain.Gen(&typeBuf)
+		return typeBuf.Bytes()
+	})
+}
+
+func getServerName(dir string, packageName string) string {
+	return fmt.Sprintf("%s/internal/server/%[2]s/%[2]sserver.go", dir, packageName)
+
+}
+func getMainName(dir string, gomod string) string {
+	return dir + "/" + gomod + ".go"
 }
 
 func getLogicName(dir string, packageName string, handler string) string {

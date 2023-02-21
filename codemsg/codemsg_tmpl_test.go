@@ -19,6 +19,7 @@ func Test_CodeMsg(t *testing.T) {
 		TypeName:          "ErrNo",
 		Args:              "--code-msg --linecomment    --type    ErrNo    ./err.go", // os.Args[2:]
 		OriginalName:      "demo",                                                    //
+		StringMethod:      "String",
 		AllVariable:       []Value{{OriginalName: "aa", Name: "bb"}},
 	}
 
