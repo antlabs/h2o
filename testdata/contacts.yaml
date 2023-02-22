@@ -1,7 +1,8 @@
 ---
 package: "contacts"
 protobuf:
-  go_package: "./pb/im/v1/contacts"
+  package: "contacts.v1"
+  go_package: "./pb/v1/im/contacts"
 init:
   handler: New #函数名, 名字是New认识是构造函数
   #req:
@@ -10,13 +11,13 @@ init:
     name: Contacts #返回的结构体名
     field:
       Host: a1.easemob.com
-      Org_name:  ""
-      App_name: ""
+      OrgName:  ""
+      AppName: ""
       UserName: ""
-      Msg_id: ""
-      Owner_username: ""
-      Friend_username: ""
-      Blocked_username: ""
+      MsgId: ""
+      OwnerUsername: ""
+      FriendUsername: ""
+      BlockedUsername: ""
 muilt:
 # 1.添加好友
 # http://docs-im-beta.easemob.com/document/server-side/user_relationship.html#%E6%B7%BB%E5%8A%A0%E5%A5%BD%E5%8F%8B
@@ -24,7 +25,9 @@ muilt:
   req:
     name: AddFriendReq
     method: POST
-    url: https://{{.Host}}/{{.Org_name}}/{{.App_name}}/users/{{.Owner_username}}/contacts/users/{{.Friend_username}}
+    template:
+      url: true
+    url: https://{{.Host}}/{{.OrgName}}/{{.AppName}}/users/{{.OwnerUsername}}/contacts/users/{{.FriendUsername}}
 
     # 直接使用配置文件里面的值
     useDefault:
@@ -64,7 +67,9 @@ muilt:
   req:
     name: DelFriendReq
     method: DELETE
-    url: https://{{.Host}}/{{.Org_name}}/{{.App_name}}/users/{{.Owner_username}}/contacts/users/{{.Friend_username}}
+    url: https://{{.Host}}/{{.OrgName}}/{{.AppName}}/users/{{.OwnerUsername}}/contacts/users/{{.FriendUsername}}
+    template:
+      url: true
 
     # 直接使用配置文件里面的值
     useDefault:
@@ -99,12 +104,14 @@ muilt:
 
 
 # 3. 获取好友列表
-# http://docs-im-beta.easemob.com/document/server-side/user_relationship.html#%E8%8E%B7%E5%8F%96%E5%A5%BD%E5%8F%8B%E5%88%97%E8%A1%A8
+# https://docs-im-beta.easemob.com/document/server-side/user_relationship.html#%E8%8E%B7%E5%8F%96%E5%A5%BD%E5%8F%8B%E5%88%97%E8%A1%A8
 - handler: Users.GetFriendList
   req:
     name: GetFriendListReq
-    method: POST
-    url: https://{{.Host}}/{{.Org_name}}/{{.App_name}}/users/{{.Owner_username}}/blocks/users/
+    method: GET
+    url: https://{{.Host}}/{{.OrgName}}/{{.AppName}}/users/{{.OwnerUsername}}/contacts/users
+    template:
+      url: true
 
     # 直接使用配置文件里面的值
     useDefault:
@@ -139,7 +146,9 @@ muilt:
   req:
     name: AddBlockedUserReq
     method: POST
-    url: https://{{.Host}}/{{.Org_name}}/{{.App_name}}/users/{{.Owner_username}}/blocks/users/
+    url: https://{{.Host}}/{{.OrgName}}/{{.AppName}}/users/{{.OwnerUsername}}/blocks/users/
+    template:
+      url: true
 
     # 直接使用配置文件里面的值
     useDefault:
@@ -176,7 +185,9 @@ muilt:
   req:
     name: GetBlockedUserListReq
     method: GET
-    url: https://{{.Host}}/{{.Org_name}}/{{.App_name}}/users/{{.Owner_username}}/blocks/users/
+    url: https://{{.Host}}/{{.OrgName}}/{{.AppName}}/users/{{.OwnerUsername}}/blocks/users/
+    template:
+      url: true
     # 直接使用配置文件里面的值
     useDefault:
       header:
@@ -205,7 +216,9 @@ muilt:
   req:
     name: DelBlockedUserReq
     method: DELETE
-    url: https://{{.Host}}/{{.Org_name}}/{{.App_name}}/users/{{.Owner_username}}/blocks/users/{{.Blocked_username}}
+    url: https://{{.Host}}/{{.OrgName}}/{{.AppName}}/users/{{.OwnerUsername}}/blocks/users/{{.BlockedUsername}}
+    template:
+      url: true
 
 
     # 直接使用配置文件里面的值

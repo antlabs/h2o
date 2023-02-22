@@ -1,7 +1,8 @@
 ---
 package: "metadata"
 protobuf:
-  go_package: "./pb/im/v1/metadata"
+  package: "metadata.v1"
+  go_package: "./pb/v1/im/metadata"
 init:
   handler: New #函数名, New是构造函数
   #req:
@@ -23,6 +24,8 @@ muilt:
     name: CreateUserMetadataReq
     method: POST
     url: https://{{.Host}}/{{.Org_name}}/{{.App_name}}/metadata/user/{{.UserName}}
+    template:
+      url: true
     # 直接使用配置文件里面的值
     useDefault:
       header:
@@ -58,6 +61,8 @@ muilt:
     #name: CreateUsersReq
     method: GET
     url: https://{{.Host}}/{{.Org_name}}/{{.App_name}}/metadata/user/{{.UserName}}
+    template:
+      url: true
     # 直接使用配置文件里面的值
     useDefault:
       header:
@@ -88,6 +93,8 @@ muilt:
     method: POST
     url: https://{{.Host}}/{{.Org_name}}/{{.App_name}}/metadata/user/get
     # 直接使用配置文件里面的值
+    template:
+      url: true
     useDefault:
       header:
       - Content-Type
@@ -133,6 +140,8 @@ muilt:
     #name: CreateUsersReq
     method: GET
     url: https://{{.Host}}/{{.Org_name}}/{{.App_name}}/metadata/user/capacity
+    template:
+      url: true
     # 直接使用配置文件里面的值
     useDefault:
       header:
@@ -155,6 +164,8 @@ muilt:
     #name: CreateUsersReq
     method: DELETE
     url: https://{{.Host}}/{{.Org_name}}/{{.App_name}}/metadata/user/{{.UserName}}
+    template:
+      url: true
     # 直接使用配置文件里面的值
     useDefault:
       header:

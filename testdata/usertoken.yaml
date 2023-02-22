@@ -1,7 +1,8 @@
 ---
 package: "usertoken"
 protobuf:
-  go_package: "./pb/im/v1/usertoken"
+  package: "usertoken.v1"
+  go_package: "./pb/v1/im/usertoken"
 init:
   handler: New #函数名, 名字是New认识是构造函数
   #req:
@@ -10,15 +11,17 @@ init:
     name: UserToken #返回的结构体名
     field:
       Host:  a1.easemob.com 
-      Org_name:  ""
-      App_name: ""
+      OrgName:  ""
+      AppName: ""
 
 muilt:
 - handler: UserToken.GetUserToken
   req:
     method: POST
-    url: https://{{.Host}}/{{.Org_name}}/{{.App_name}}/token
+    url: https://{{.Host}}/{{.OrgName}}/{{.AppName}}/token
     # 直接使用配置文件里面的值
+    template:
+      url: true
     useDefault:
       header:
       - Content-Type

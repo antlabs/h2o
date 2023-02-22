@@ -1,7 +1,8 @@
 ---
 package: "apptoken"
 protobuf:
-  go_package: "./pb/im/v1/apptoken"
+  package: "apptoken.v1"
+  go_package: "./pb/v1/im/apptoken"
 init:
   handler: New #函数名, 名字是New认识是构造函数
   #req:
@@ -10,15 +11,15 @@ init:
     name: AppToken #返回的结构体名
     field:
       Host: a1.easemob.com 
-      Org_name:  ""
-      App_name: ""
+      OrgName:  ""
+      AppName: ""
 
 muilt:
 - handler: AppToken.CreateAppToken
   req:
     method: POST
-    url: https://{{.Host}}/{{.Org_name}}/{{.App_name}}/token
-    template: 
+    url: https://{{.Host}}/{{.OrgName}}/{{.AppName}}/token
+    template:
       url: true
     # 直接使用配置文件里面的值
     useDefault:

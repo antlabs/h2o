@@ -1,7 +1,8 @@
 ---
 package: "users"
 protobuf:
-  go_package: "./pb/im/v1/users"
+  package: "users.v1"
+  go_package: "./pb/v1/im/users"
 init:
   handler: New #函数名, 名字是New认识是构造函数
   #req:
@@ -10,11 +11,11 @@ init:
     name: Users #返回的结构体名
     field:
       Host: a1.easemob.com
-      Org_name:  ""
-      App_name: ""
+      OrgName:  ""
+      AppName: ""
       UserName: ""
-      Msg_id: ""
-      Owner_username: ""
+      MsgID: ""
+      OwnerUsername: ""
 muilt:
 
 # 1.开放注册单个用户
@@ -23,7 +24,9 @@ muilt:
   req:
     name: CreateUsersReq
     method: POST
-    url: https://{{.Host}}/{{.Org_name}}/{{.App_name}}/users
+    url: https://{{.Host}}/{{.OrgName}}/{{.AppName}}/users
+    template:
+      url: true
     # 直接使用配置文件里面的值
     useDefault:
       header:
@@ -63,6 +66,8 @@ muilt:
     name: CreateUsers2Req
     url: https://{host}/{org_name}/{app_name}/users
     method: POST
+    template:
+      url: true
     useDefault:
       header:
       - Content-Type
@@ -100,6 +105,8 @@ muilt:
   req:
     name: CreateUsers3Req
     url: https://{host}/{org_name}/{app_name}/users
+    template:
+      url: true
     method: POST
     useDefault:
       header:
@@ -148,8 +155,10 @@ muilt:
 - handler: Users.GetUser
   req:
     name: GetUserReq
-    url: https://{{.Host}}/{{.Org_name}}/{{.App_name}}/users/{{.UserName}}
+    url: https://{{.Host}}/{{.OrgName}}/{{.AppName}}/users/{{.UserName}}
     method: GET
+    template:
+      url: true
     useDefault:
       header:
       - Content-Type
@@ -180,8 +189,9 @@ muilt:
 - handler: Users.GetUserList
   req:
     name: GetUserListReq
-    url: https://{{.Host}}/{{.Org_name}}/{.App_name}/users?limit=2&cursor=LTgzXXXXtB
-
+    url: https://{{.Host}}/{{.OrgName}}/{.AppName}/users?limit=2&cursor=LTgzXXXXtB
+    template:
+      url: true
     method: GET
     useDefault:
       header:
@@ -226,8 +236,9 @@ muilt:
 - handler: Users.DeleteUser
   req:
     name: DeleteUserReq
-    url: https://{{.Host}}/{{.Org_name}}/{.App_name}/users/{{.UserName}}
-
+    url: https://{{.Host}}/{{.OrgName}}/{.AppName}/users/{{.UserName}}
+    template:
+      url: true
     method: DELETE
     useDefault:
       header:
@@ -263,8 +274,9 @@ muilt:
 - handler: Users.DeleteUserList
   req:
     name: DeleteUserListReq
-    url: https://{{.Host}}/{{.Org_name}}/{.App_name}/users/{{.UserName}}
-
+    url: https://{{.Host}}/{{.OrgName}}/{.AppName}/users/{{.UserName}}
+    template:
+      url: true
     method: DELETE
     useDefault:
       header:
@@ -310,8 +322,9 @@ muilt:
 - handler: Users.ModifyUserPassword
   req:
     name: ModifyUserPasswordReq
-    url: https://{{.Host}}/{{.Org_name}}/{.App_name}/users/{{.UserName}}
-
+    url: https://{{.Host}}/{{.OrgName}}/{.AppName}/users/{{.UserName}}
+    template:
+      url: true
     method: PUT
     useDefault:
       header:
@@ -335,8 +348,9 @@ muilt:
 - handler: Users.GetUserStatus
   req:
     name: GetUserStatusReq
-    url: https://{{.Host}}/{{.Org_name}}/{.App_name}/users/{{.UserName}}/status
-
+    url: https://{{.Host}}/{{.OrgName}}/{.AppName}/users/{{.UserName}}/status
+    template:
+      url: true
     method: GET
     useDefault:
       header:
@@ -366,8 +380,9 @@ muilt:
 - handler: Users.GetUserStatusList
   req:
     name: GetUserStatusListReq
-    url: https://{{.Host}}/{{.Org_name}}/{.App_name}/users/batch/status
-
+    url: https://{{.Host}}/{{.OrgName}}/{.AppName}/users/batch/status
+    template:
+      url: true
     method: GET
     useDefault:
       header:
@@ -395,8 +410,9 @@ muilt:
 - handler: Users.SetGlobalMutesUsers
   req:
     name: SetGlobalMutesUsersReq
-    url: https://{{.Host}}/{{.Org_name}}/{.App_name}/mutes/{{.UserName}}
-
+    url: https://{{.Host}}/{{.OrgName}}/{.AppName}/mutes/{{.UserName}}
+    template:
+      url: true
     method: POST
     useDefault:
       header:
@@ -429,8 +445,9 @@ muilt:
 - handler: Users.SetMutesUsers
   req:
     name: SetMutesUsersReq
-    url: https://{{.Host}}/{{.Org_name}}/{.App_name}/mutes/{{.UserName}}
-
+    url: https://{{.Host}}/{{.OrgName}}/{.AppName}/mutes/{{.UserName}}
+    template:
+      url: true
     method: POST
     useDefault:
       header:
@@ -467,8 +484,9 @@ muilt:
 - handler: Users.SetMutesUsersAll
   req:
     name: SetMutesUsersAllReq
-    url: https://{{.Host}}/{{.Org_name}}/{.App_name}/mutes
-
+    url: https://{{.Host}}/{{.OrgName}}/{.AppName}/mutes
+    template:
+      url: true
     method: POST
     useDefault:
       header:
@@ -515,8 +533,9 @@ muilt:
 - handler: Users.UserOfflineMsgCount
   req:
     name: UserOfflineMsgCountReq
-    url: https://{{.Host}}/{{.Org_name}}/{.App_name}/users/{{.UserName}}/{{.Owner_username}}/offline_msg_count
-
+    url: https://{{.Host}}/{{.OrgName}}/{.AppName}/users/{{.UserName}}/{{.OwnerUsername}}/offline_msg_count
+    template:
+      url: true
     method: GET
     useDefault:
       header:
@@ -547,8 +566,9 @@ muilt:
 - handler: Users.UserOfflineMsgStatus
   req:
     name: UserOfflineMsgStatusReq
-    url: https://{{.Host}}/{{.Org_name}}/{.App_name}/users/{{.UserName}}/offline_msg_status/{{.Msg_id}}
-
+    url: https://{{.Host}}/{{.OrgName}}/{.AppName}/users/{{.UserName}}/offline_msg_status/{{.MsgID}}
+    template:
+      url: true
     method: GET
     useDefault:
       header:
@@ -581,8 +601,9 @@ muilt:
 - handler: Users.UserDeactivate
   req:
     name: UserDeactivateReq
-    url: https://{{.Host}}/{{.Org_name}}/{.App_name}/users/{{.UserName}}/deactivate
-
+    url: https://{{.Host}}/{{.OrgName}}/{.AppName}/users/{{.UserName}}/deactivate
+    template:
+      url: true
     method: POST
     useDefault:
       header:
@@ -614,8 +635,9 @@ muilt:
 - handler: Users.UserActivate
   req:
     name: UserActivateReq
-    url: https://{{.Host}}/{{.Org_name}}/{.App_name}/users/{{.UserName}}/activate
-
+    url: https://{{.Host}}/{{.OrgName}}/{.AppName}/users/{{.UserName}}/activate
+    template:
+      url: true
     method: POST
     useDefault:
       header:
@@ -638,8 +660,9 @@ muilt:
 - handler: Users.UserDisconnect
   req:
     name: UserDisconnectReq
-    url: https://{{.Host}}/{{.Org_name}}/{.App_name}/users/{{.UserName}}/disconnect
-
+    url: https://{{.Host}}/{{.OrgName}}/{.AppName}/users/{{.UserName}}/disconnect
+    template:
+      url: true
     method: GET
     useDefault:
       header:
