@@ -1,14 +1,3 @@
-package client
-
-import (
-	"io"
-	"text/template"
-
-	"github.com/antlabs/h2o/pyaml"
-)
-
-const (
-	httpTypeTemplate = `
 package {{.PackageName}}
 
   {{range $value := .ReqResp}}
@@ -49,15 +38,3 @@ package {{.PackageName}}
     {{end}}
 
   {{end}}
-  `
-)
-
-func newTypeTemplate() *template.Template {
-	tmpl := httpTypeTemplate
-	return template.Must(template.New("h2o-http-client-type-tmpl").Parse(tmpl))
-}
-
-func Gen(t *pyaml.TypeTmpl, w io.Writer) {
-	tpl := newTypeTemplate()
-	tpl.Execute(w, *t)
-}

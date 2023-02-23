@@ -6,6 +6,9 @@ import (
 	"strings"
 
 	"github.com/antlabs/h2o/http/client"
+	"github.com/antlabs/h2o/http/server"
+	"github.com/antlabs/h2o/http/types"
+	"github.com/antlabs/h2o/internal/gomod"
 	"github.com/antlabs/h2o/internal/save"
 	"github.com/antlabs/h2o/model"
 	"github.com/antlabs/h2o/parser"
@@ -15,23 +18,25 @@ import (
 )
 
 // 1.生成客户端代码, OK
-// h2o http -f ./testdata/dst.yaml -g client
+// h2o http -f ./testdata/dst.yaml --client
 
-// TODO
 // 2.生成服务端代码
-// h2o http -f ./testdata/dst.yaml -g server
+// h2o http -f ./testdata/dst.yaml --server
 
-// 3.TODO
-// 生成客户端和服务端代码
-// h2o http -f ./testdata/dst.yaml -g client server
+// 3.生成客户端和服务端代码
+// h2o http -f ./testdata/dst.yaml --client --server
 type HTTP struct {
-	File []string `clop:"short;long;greedy" usage:"Parsing dst files" valid:"required"`
-	Gen  []string `clop:"short;long;greedy" usage:"Generate client or server code" valid:"required"`
-	Dir  string   `clop:"short;long" usage:"gen dir" default:"."`
+	File   []string `clop:"short;long;greedy" usage:"Parsing dst files" valid:"required"`
+	Client bool     `clop:"short;long" usage:"gen http client code"`
+	Server bool     `clop:"short;long" usage:"gen http server code"`
+	Dir    string   `clop:"short;long" usage:"gen dir" default:"."`
 }
 
 // 入口函数
 func (h *HTTP) SubMain() {
+
+	goModName := gomod.GetGoModuleName(h.Dir)
+	routes := server.RoutesTmpl{}
 	for _, f := range h.File {
 
 		c, err := parser.Parser(f)
@@ -40,13 +45,22 @@ func (h *HTTP) SubMain() {
 			return
 		}
 
-		tmplClient := client.ClientTmpl{PackageName: c.Package,
+		tmplClient := client.ClientTmpl{
+			PackageName:  c.Package,
 			InitField:    c.Init.Resp.Field,
 			StructName:   c.Init.Resp.Name,
 			ReceiverName: strings.ToLower(string(c.Init.Resp.Name[0])),
 		}
 
-		tmplType := pyaml.TypeTmpl{PackageName: c.Package}
+		tmplClientType := pyaml.TypeTmpl{PackageName: c.Package}
+
+		hp := h
+		logicDir := ""
+		handlerDir := ""
+		if h.Server {
+			logicDir = save.MkdirAndClean(getLogicPrefix(hp.Dir, c.Package))
+			handlerDir = save.MkdirAndClean(getHandlerPrefix(hp.Dir, c.Package))
+		}
 
 		for _, h := range c.Muilt {
 
@@ -80,6 +94,35 @@ func (h *HTTP) SubMain() {
 				}
 			}
 
+			hasQuery := len(query.StructType) > 0
+			hasHeader := len(h.Req.Header) > 0
+			hasJSONBody := h.Req.Body != nil
+
+			if hp.Server {
+
+				save.TmplFile(getLogicName(logicDir, handler), true, func() []byte {
+					var buf bytes.Buffer
+					logicTmpl := server.LogicTmpl{SubPackageName: c.Package, GoMod: goModName, Handler: handler, ReqName: h.Req.Name, RespName: h.Resp.Name}
+					logicTmpl.Gen(&buf)
+					return buf.Bytes()
+				})
+
+				save.TmplFile(getHandlerName(handlerDir, handler), true, func() []byte {
+					var buf bytes.Buffer
+					handlerTmpl := server.HandlerTmpl{SubPackageName: c.Package,
+						GoMod:       goModName,
+						Handler:     handler,
+						ReqName:     h.Req.Name,
+						HasQuery:    hasQuery,
+						HasHeader:   hasHeader,
+						HasJSONBody: hasJSONBody,
+					}
+					handlerTmpl.Gen(&buf)
+					return buf.Bytes()
+				})
+
+			}
+
 			reqHeader, defReqHeader, respHeader, _, err := pyaml.GetHeader(h)
 			if err != nil {
 				return
@@ -87,7 +130,7 @@ func (h *HTTP) SubMain() {
 
 			reqBody, defReqBody, respBody, err := pyaml.GetBody(h, false)
 
-			tmplType.ReqResp = append(tmplType.ReqResp, pyaml.ReqResp{
+			tmplClientType.ReqResp = append(tmplClientType.ReqResp, pyaml.ReqResp{
 				Req: pyaml.Req{
 					Name:   h.Req.Name,
 					Query:  query,
@@ -112,41 +155,87 @@ func (h *HTTP) SubMain() {
 				DefReqHeader: defReqHeader,
 				DefReqBody:   defReqBody,
 				ReqWWWForm:   h.Req.Encode.Body == model.WWWForm,
-				HaveQuery:    len(query.StructType) > 0,
-				HaveHeader:   len(h.Req.Header) > 0,
-				HaveReqBody:  h.Req.Body != nil,
+				HaveQuery:    hasQuery,
+				HaveHeader:   hasHeader,
+				HaveReqBody:  hasJSONBody,
+			})
+
+			if hp.Server {
+				routes.AllRoute = append(routes.AllRoute,
+					server.Routes{
+						Method:         h.Req.Method,
+						Path:           h.Req.URL,
+						SubPackageName: c.Package,
+						Handler:        handler,
+					})
+			}
+		}
+
+		if h.Client {
+			dir := save.Mkdir(h.Dir, tmplClient.PackageName)
+			save.TmplFile(getClientFuncName(dir, tmplClient.PackageName), true, func() []byte {
+				var buf bytes.Buffer
+				tmplClient.Gen(&buf)
+				return buf.Bytes()
+			})
+			// 保存客户端结构体定义
+			save.TmplFile(getClientTypeName(dir, tmplClient.PackageName), true, func() []byte {
+				var typeBuf bytes.Buffer
+				types.Gen(&tmplClientType, &typeBuf)
+				return typeBuf.Bytes()
+			})
+			save.TmplFile(getClientLogicName(dir, tmplClient.PackageName), true, func() []byte {
+				var buf bytes.Buffer
+				tmplClient.GenLogic(&buf)
+				return buf.Bytes()
 			})
 		}
 
-		dir := save.Mkdir(h.Dir, tmplClient.PackageName)
-		save.TmplFile(getFuncName(dir, tmplClient.PackageName), true, func() []byte {
-			var buf bytes.Buffer
-			tmplClient.Gen(&buf)
-			return buf.Bytes()
-		})
+		if h.Server {
+			// 保存服务端结构体定义
+			dir := save.MkdirAndClean(getServerTypePrefix(h.Dir, tmplClient.PackageName))
+			save.TmplFile(getServerTypeName(dir, tmplClient.PackageName), true, func() []byte {
+				var typeBuf bytes.Buffer
+				types.Gen(&tmplClientType, &typeBuf)
+				return typeBuf.Bytes()
+			})
+		}
+	}
 
-		save.TmplFile(getTypeName(dir, tmplClient.PackageName), true, func() []byte {
+	if h.Server {
+		// 保存main.go 服务入口文件
+		goModeLastName := gomod.GetGoModuleLastName(h.Dir)
+		dir := save.MkdirAndClean(getServerPrefixMain(h.Dir, goModeLastName))
+
+		// 保存至 xx.go并且格式化
+		save.TmplFile(getServerMainName(dir, goModeLastName), true, func() []byte {
 			var typeBuf bytes.Buffer
-			client.Gen(&tmplType, &typeBuf)
+			server.Gen(&server.MainTmpl{GoMod: goModName}, &typeBuf)
 			return typeBuf.Bytes()
 		})
-		save.TmplFile(getLogicName(dir, tmplClient.PackageName), true, func() []byte {
-			var buf bytes.Buffer
-			tmplClient.GenLogic(&buf)
-			return buf.Bytes()
+
+		// svc, 保存至servercontext.go并且格式化
+		dir = save.MkdirAndClean(getServerSvcPrefix(h.Dir))
+		save.TmplFile(getServerSvcName(dir), true, func() []byte {
+			var typeBuf bytes.Buffer
+			(&server.SvcTmpl{GoMod: goModName}).Gen(&typeBuf)
+			return typeBuf.Bytes()
 		})
 
+		// config， 保存到config.go并且格式化
+		dir = save.MkdirAndClean(getServerConfigPrefix(h.Dir))
+		save.TmplFile(getServerConfigName(dir), true, func() []byte {
+			var typeBuf bytes.Buffer
+			server.GenConfig(&typeBuf)
+			return typeBuf.Bytes()
+		})
+
+		save.TmplFile(getRoutesName(getRoutesPrefix(h.Dir)), true, func() []byte {
+			var typeBuf bytes.Buffer
+			server.GenConfig(&typeBuf)
+			return typeBuf.Bytes()
+
+		})
 	}
-}
 
-func getFuncName(dir string, packageName string) string {
-	return dir + "/" + packageName + ".go"
-}
-
-func getTypeName(dir string, packageName string) string {
-	return dir + "/" + packageName + "_type.go"
-}
-
-func getLogicName(dir string, packageName string) string {
-	return dir + "/" + packageName + "_logic.go"
 }

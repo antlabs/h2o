@@ -14,7 +14,7 @@ var (
 	//go:embed client.tmpl
 	httpClientTemplate string
 
-	//go:embed type.tmpl
+	//go:embed logic.tmpl
 	httpClientLogicTemplate string
 )
 

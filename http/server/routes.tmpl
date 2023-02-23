@@ -1,0 +1,19 @@
+package handler
+
+import (
+	"tmpl/api/internal/svc"
+
+	"github.com/gin-gonic/gin"
+)
+
+func RegisterHandlers(g *gin.Engine, serverCtx *svc.ServiceContext) {
+  {{/* 这里会生成这样的代码 c.GET("/im/xx", user.LoginSmsHandler(serverCtx)) */}}
+
+  {{- range $value := .AllRoute}}
+  {{- $Method := $value.Method}}
+  {{- $Path := $value.Path}}
+  {{- $SubPackageName := $value.SubPackageName}}
+  {{- $Handler := $value.Handler}}
+	c.{{$Method}}({{$Path}}, {{$SubPackageName}}.{{$Handler}}Handler(serverCtx))
+  {{- end}}
+}

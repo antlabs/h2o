@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/Masterminds/sprig/v3 v3.2.3
 	github.com/antlabs/deepcopy v0.0.6
-	github.com/antlabs/gstl v0.0.5
+	github.com/antlabs/gstl v0.0.6
 	github.com/antlabs/tostruct v0.0.6
 	github.com/gobeam/stringy v0.0.5
 	github.com/guonaihong/clop v0.2.9
@@ -32,6 +32,7 @@ require (
 	github.com/shopspring/decimal v1.2.0 // indirect
 	github.com/spf13/cast v1.3.1 // indirect
 	golang.org/x/crypto v0.3.0 // indirect
+	golang.org/x/exp v0.0.0-20220328175248-053ad81199eb // indirect
 	golang.org/x/mod v0.7.0 // indirect
 	golang.org/x/sys v0.4.0 // indirect
 	golang.org/x/text v0.4.0 // indirect

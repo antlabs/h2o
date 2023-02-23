@@ -35,7 +35,9 @@ func TmplFile(fileName string, isFmt bool, getTmpl func() []byte) {
 		}
 
 		//os.Stdout.Write(fmtType)
-		os.WriteFile(fileName, buf, 0644)
+		if err := os.WriteFile(fileName, buf, 0644); err != nil {
+			panic(err.Error())
+		}
 	} else {
 		fmt.Printf("%s 已经存在，忽略\n", fileName)
 	}

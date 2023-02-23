@@ -1,0 +1,48 @@
+package {{.SubPackageName}}
+
+import (
+	"{{.GoMod}}/api/internal/logic/{{.SubPackageName}}"
+	"{{.GoMod}}/api/internal/svc"
+	type{{.SubPackageName}} "tmpl/api/internal/types/{{.SubPackageName}}"
+
+	"github.com/gin-gonic/gin"
+)
+
+func {{.Handler}}Handler(svcCtx *svc.ServiceContext) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var req type{{.SubPackageName}}.{{.ReqName}}
+    {{if .HasHeader}}
+    if err := c.ShouldBindHeader(&req.Header); err != nil {
+        c.JSON(500, gin.H{"Code":1, "Message":err.Error()})
+        return
+    }
+    {{end}}
+
+    {{if .HasURL}}
+    if err := c.ShouldBindUri(&req.URL); err != nil {
+        c.JSON(500, gin.H{"Code":1, "Message":err.Error()})
+        return
+    }
+    {{end}}
+
+    {{if .HasQuery}}
+    if err := c.ShouldBindQuery(&req.Query); err != nil {
+        c.JSON(500, gin.H{"Code":1, "Message":err.Error()})
+        return
+    }
+    {{end}}
+    {{if .HasJSONBody}}
+    if err := c.ShouldBindJSON(&req.Body); err != nil {
+        c.JSON(500, gin.H{"Code":1, "Message":err.Error()})
+        return
+    }
+    {{end}}
+		l := upload.New{{.ReqName}}Logic(c, svcCtx)
+		resp, err := l.Upload(&req)
+		if err != nil {
+			c.JSON(500, resp)
+		} else {
+			c.JSON(200, resp)
+		}
+	}
+}

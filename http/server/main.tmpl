@@ -1,0 +1,37 @@
+package main
+
+import (
+	"flag"
+	"fmt"
+	"{{.GoMod}}/api/internal/handler"
+
+	"{{.GoMod}}/api/internal/config"
+	"{{.GoMod}}/api/internal/svc"
+
+	"github.com/gin-gonic/gin"
+	"github.com/zeromicro/go-zero/core/conf"
+)
+
+var configFile = flag.String("f", "etc/{{.GoMod}}.yaml", "the config file")
+
+func main() {
+	flag.Parse()
+
+	var c config.Config
+	conf.MustLoad(*configFile, &c)
+
+	server := gin.Default()
+
+	ctx := svc.NewServiceContext(c)
+	// 全局中间件 增加统一参数
+	server.Use(func() gin.HandlerFunc {
+		return func(c *gin.Context) {
+			c.Next()
+		}
+	}())
+
+	handler.RegisterHandlers(server, ctx)
+
+	fmt.Printf("Starting server at %s...\n", c.Addr)
+	server.Run()
+}

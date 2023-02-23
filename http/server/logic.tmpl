@@ -1,0 +1,29 @@
+package {{.SubPackageName}}
+
+import (
+	"context"
+	"{{.GoMod}}/api/internal/svc"
+	types{{.SubPackageName}} "tmpl/api/internal/types/{{.SubPackageName}}"
+
+	"github.com/gin-gonic/gin"
+	// "github.com/zeromicro/go-zero/core/logx"
+)
+
+type {{.Handler}}Logic struct {
+	// logx.Logger
+	ctx    context.Context
+	svcCtx *svc.ServiceContext
+}
+
+func New{{.Handler}}Logic(ctx *gin.Context, svcCtx *svc.ServiceContext) *{{.Handler}}Logic {
+	return &{{.Handler}}Logic{
+		// Logger: logx.WithContext(ctx),
+		ctx:    ctx,
+		svcCtx: svcCtx,
+	}
+}
+
+func (l *{{.Handler}}Logic) {{.Handler}}(req *types{{.SubPackageName}}.{{.ReqName}}) (resp *types{{.SubPackageName}}.{{.RespName}}, err error) {
+   // 这里写业务逻辑
+	return nil, nil
+}

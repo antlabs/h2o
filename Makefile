@@ -4,6 +4,10 @@ build:
 test:
 	go test ./...
 
+http.server:
+	rm -rf api
+	./h2o http -f ./testdata/users.yaml --server
+
 # codemsg测试
 codemsg:
 	go build ./cmd/h2o/h2o.go

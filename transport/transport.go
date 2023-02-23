@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/antlabs/h2o/internal/gomod"
 	"github.com/antlabs/h2o/internal/save"
 	"github.com/antlabs/h2o/parser"
 )
@@ -12,11 +13,6 @@ import (
 const (
 	goZero     = "go-zero"
 	httpClient = "h2o-http-client"
-)
-
-var (
-	spaceBytes = []byte(" ")
-	lineBytes  = []byte("\n")
 )
 
 // 这是主模块
@@ -36,29 +32,10 @@ type Transport struct {
 	Dir string `clop:"short;long" usage:"gen dir" default:"."`
 }
 
-func (t *Transport) getGoModuleName() string {
-	all, err := os.ReadFile(t.Dir + "/go.mod")
-	if err != nil {
-		panic(err.Error())
-	}
-
-	start := bytes.Index(all, spaceBytes)
-	if start == -1 {
-		panic("not found space")
-	}
-
-	end := bytes.Index(all, lineBytes)
-	if end == -1 {
-		panic(`not found \n`)
-	}
-
-	return string(all[start+1 : end])
-}
-
 // 入口
 func (t *Transport) SubMain() {
 
-	gomod := t.getGoModuleName()
+	gomod := gomod.GetGoModuleName(t.Dir)
 	tmplMain := goZeroMain{GoModName: gomod, GoZeroBaseURL: t.FromBaseURL}
 	tmplServer := goZeroServer{GoZeroBaseURL: t.FromBaseURL, GoModName: gomod}
 	for _, f := range t.File {
