@@ -3,7 +3,7 @@ package {{.SubPackageName}}
 import (
 	"context"
 	"{{.GoMod}}/api/internal/svc"
-	types{{.SubPackageName}} "tmpl/api/internal/types/{{.SubPackageName}}"
+	types{{.SubPackageName}} "{{.GoMod}}/api/internal/types/{{.SubPackageName}}"
 
 	"github.com/gin-gonic/gin"
 	// "github.com/zeromicro/go-zero/core/logx"
@@ -25,5 +25,5 @@ func New{{.Handler}}Logic(ctx *gin.Context, svcCtx *svc.ServiceContext) *{{.Hand
 
 func (l *{{.Handler}}Logic) {{.Handler}}(req *types{{.SubPackageName}}.{{.ReqName}}) (resp *types{{.SubPackageName}}.{{.RespName}}, err error) {
    // 这里写业务逻辑
-	return nil, nil
+	return 
 }

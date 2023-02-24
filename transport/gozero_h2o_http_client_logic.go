@@ -2,8 +2,8 @@ package transport
 
 import (
 	_ "embed"
-	"html/template"
 	"io"
+	"text/template"
 	//"github.com/Masterminds/sprig"
 )
 

@@ -36,7 +36,7 @@ type HTTP struct {
 func (h *HTTP) SubMain() {
 
 	goModName := gomod.GetGoModuleName(h.Dir)
-	routes := server.RoutesTmpl{}
+	routes := server.RoutesTmpl{GoMod: goModName}
 	for _, f := range h.File {
 
 		c, err := parser.Parser(f)
@@ -53,6 +53,7 @@ func (h *HTTP) SubMain() {
 		}
 
 		tmplClientType := pyaml.TypeTmpl{PackageName: c.Package}
+		routes.AllSubPackageName = append(routes.AllSubPackageName, c.Package)
 
 		hp := h
 		logicDir := ""
@@ -164,7 +165,7 @@ func (h *HTTP) SubMain() {
 				routes.AllRoute = append(routes.AllRoute,
 					server.Routes{
 						Method:         h.Req.Method,
-						Path:           h.Req.URL,
+						Path:           server.TakeURL(h.Req.URL, h.Req.Template.URL),
 						SubPackageName: c.Package,
 						Handler:        handler,
 					})
@@ -204,13 +205,13 @@ func (h *HTTP) SubMain() {
 
 	if h.Server {
 		// 保存main.go 服务入口文件
-		goModeLastName := gomod.GetGoModuleLastName(h.Dir)
-		dir := save.MkdirAndClean(getServerPrefixMain(h.Dir, goModeLastName))
+		goModLastName := gomod.GetGoModuleLastName(h.Dir)
+		dir := save.MkdirAndClean(getServerPrefixMain(h.Dir, goModLastName))
 
 		// 保存至 xx.go并且格式化
-		save.TmplFile(getServerMainName(dir, goModeLastName), true, func() []byte {
+		save.TmplFile(getServerMainName(dir, goModLastName), true, func() []byte {
 			var typeBuf bytes.Buffer
-			server.Gen(&server.MainTmpl{GoMod: goModName}, &typeBuf)
+			server.Gen(&server.MainTmpl{GoMod: goModName, GoModLastName: goModLastName}, &typeBuf)
 			return typeBuf.Bytes()
 		})
 
@@ -230,11 +231,20 @@ func (h *HTTP) SubMain() {
 			return typeBuf.Bytes()
 		})
 
+		// routes 保存至的routes.go并且格式化
 		save.TmplFile(getRoutesName(getRoutesPrefix(h.Dir)), true, func() []byte {
 			var typeBuf bytes.Buffer
-			server.GenConfig(&typeBuf)
+			routes.Gen(&typeBuf)
 			return typeBuf.Bytes()
+		})
 
+		// routes 保存至的routes.go并且格式化
+		dir = save.MkdirAndClean(getEtcPrefix(h.Dir))
+		save.TmplFile(getEtcName(dir, goModLastName), false, func() []byte {
+			var typeBuf bytes.Buffer
+			g := server.ConfigYAML{GoModLastName: goModLastName}
+			g.Gen(&typeBuf)
+			return typeBuf.Bytes()
 		})
 	}
 

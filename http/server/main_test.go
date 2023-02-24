@@ -6,5 +6,5 @@ import (
 )
 
 func TestMain(m *testing.T) {
-	Gen(&MainTmpl{GoMod: "xx"}, os.Stdout)
+	Gen(&MainTmpl{GoMod: "githug.com/g/xx", GoModLastName: "xx"}, os.Stdout)
 }

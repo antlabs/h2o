@@ -2,8 +2,8 @@ package server
 
 import (
 	_ "embed"
-	"html/template"
 	"io"
+	"text/template"
 )
 
 type SvcTmpl struct {
@@ -15,7 +15,7 @@ var SvcTemplate string
 
 func (s *SvcTmpl) Gen(w io.Writer) {
 	tpl := func() *template.Template {
-		tmpl := httpMainTemplate
+		tmpl := SvcTemplate
 		return template.Must(template.New("h2o-http-server-svc-tmpl").Parse(tmpl))
 	}()
 	tpl.Execute(w, *s)

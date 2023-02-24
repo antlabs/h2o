@@ -12,7 +12,7 @@ import (
 	"github.com/zeromicro/go-zero/core/conf"
 )
 
-var configFile = flag.String("f", "etc/{{.GoMod}}.yaml", "the config file")
+var configFile = flag.String("f", "./api/etc/{{.GoModLastName}}.yaml", "the config file")
 
 func main() {
 	flag.Parse()
@@ -33,5 +33,5 @@ func main() {
 	handler.RegisterHandlers(server, ctx)
 
 	fmt.Printf("Starting server at %s...\n", c.Addr)
-	server.Run()
+	server.Run(c.Addr)
 }

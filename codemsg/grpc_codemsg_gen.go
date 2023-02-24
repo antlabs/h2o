@@ -1,8 +1,8 @@
 package codemsg
 
 import (
-	"html/template"
 	"io"
+	"text/template"
 
 	_ "embed"
 )

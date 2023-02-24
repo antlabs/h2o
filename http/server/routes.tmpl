@@ -1,9 +1,13 @@
 package handler
 
 import (
-	"tmpl/api/internal/svc"
-
+	"{{.GoMod}}/api/internal/svc"
 	"github.com/gin-gonic/gin"
+
+  {{$GoMod := .GoMod}}
+  {{- range $SubPackageName := .AllSubPackageName}}
+	"{{$GoMod}}/api/internal/handler/{{$SubPackageName}}"
+  {{- end}}
 )
 
 func RegisterHandlers(g *gin.Engine, serverCtx *svc.ServiceContext) {
@@ -14,6 +18,6 @@ func RegisterHandlers(g *gin.Engine, serverCtx *svc.ServiceContext) {
   {{- $Path := $value.Path}}
   {{- $SubPackageName := $value.SubPackageName}}
   {{- $Handler := $value.Handler}}
-	c.{{$Method}}({{$Path}}, {{$SubPackageName}}.{{$Handler}}Handler(serverCtx))
+	g.{{$Method}}({{$Path|printf "%q"}}, {{$SubPackageName}}.{{$Handler}}Handler(serverCtx))
   {{- end}}
 }

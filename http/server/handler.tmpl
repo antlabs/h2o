@@ -3,7 +3,7 @@ package {{.SubPackageName}}
 import (
 	"{{.GoMod}}/api/internal/logic/{{.SubPackageName}}"
 	"{{.GoMod}}/api/internal/svc"
-	type{{.SubPackageName}} "tmpl/api/internal/types/{{.SubPackageName}}"
+	type{{.SubPackageName}} "{{.GoMod}}/api/internal/types/{{.SubPackageName}}"
 
 	"github.com/gin-gonic/gin"
 )
@@ -37,8 +37,8 @@ func {{.Handler}}Handler(svcCtx *svc.ServiceContext) gin.HandlerFunc {
         return
     }
     {{end}}
-		l := upload.New{{.ReqName}}Logic(c, svcCtx)
-		resp, err := l.Upload(&req)
+		l := {{.SubPackageName}}.New{{.Handler}}Logic(c, svcCtx)
+		resp, err := l.{{.Handler}}(&req)
 		if err != nil {
 			c.JSON(500, resp)
 		} else {

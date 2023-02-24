@@ -2,12 +2,14 @@ package server
 
 import (
 	_ "embed"
-	"html/template"
 	"io"
+	"text/template"
 )
 
 type RoutesTmpl struct {
-	AllRoute []Routes
+	AllRoute          []Routes
+	GoMod             string
+	AllSubPackageName []string
 }
 
 type Routes struct {

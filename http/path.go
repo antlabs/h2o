@@ -17,8 +17,8 @@ func getClientTypeName(dir string, packageName string) string {
 }
 
 // server: main包前缀
-func getServerPrefixMain(dir string, goModeLastName string) string {
-	return fmt.Sprintf("%s/api/cmd/%s", dir, goModeLastName)
+func getServerPrefixMain(dir string, goModLastName string) string {
+	return fmt.Sprintf("%s/api/cmd/%s", dir, goModLastName)
 }
 
 // server: main包全路径
@@ -83,4 +83,14 @@ func getRoutesPrefix(dir string) string {
 // server: routes 全路径
 func getRoutesName(dir string) string {
 	return fmt.Sprintf("%s/routes.go", dir)
+}
+
+// server: etc 目录前缀
+func getEtcPrefix(dir string) string {
+	return fmt.Sprintf("%s/api/etc/", dir)
+}
+
+// server: etc 目录前缀
+func getEtcName(dir string, goModLastName string) string {
+	return fmt.Sprintf("%s/%s.yaml", dir, goModLastName)
 }

@@ -2,8 +2,8 @@ package codemsg
 
 import (
 	_ "embed"
-	"html/template"
 	"io"
+	"text/template"
 
 	"github.com/gobeam/stringy"
 )

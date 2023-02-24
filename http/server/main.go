@@ -2,12 +2,14 @@ package server
 
 import (
 	_ "embed"
-	"html/template"
+	"text/template"
+
 	"io"
 )
 
 type MainTmpl struct {
-	GoMod string
+	GoMod         string
+	GoModLastName string
 }
 
 //go:embed main.tmpl

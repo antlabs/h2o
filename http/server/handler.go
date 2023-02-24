@@ -2,8 +2,8 @@ package server
 
 import (
 	_ "embed"
-	"html/template"
 	"io"
+	"text/template"
 )
 
 type HandlerTmpl struct {
