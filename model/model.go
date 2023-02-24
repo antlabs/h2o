@@ -4,7 +4,7 @@ import "strings"
 
 type Config struct {
 	Init     Init     `yaml:"init"`
-	Muilt    []Muilt  `yaml:"muilt"`
+	Multi    []Multi  `yaml:"multi"`
 	Package  string   `yaml:"package"`
 	Protobuf Protobuf `yaml:"protobuf"`
 }
@@ -29,14 +29,14 @@ type InitResp struct {
 	Field map[string]string `yaml:"field"`
 }
 
-type Muilt struct {
+type Multi struct {
 	Handler    string `yaml:"handler"`
 	structName string
 	Req        Req  `yaml:"req"`
 	Resp       Resp `yaml:"resp"`
 }
 
-func (m *Muilt) ModifyHandler() {
+func (m *Multi) ModifyHandler() {
 
 	if pos := strings.Index(m.Handler, "."); pos != -1 {
 		m.structName = m.Handler[:pos]
@@ -44,14 +44,14 @@ func (m *Muilt) ModifyHandler() {
 	}
 }
 
-func (m *Muilt) GetReqName() string {
+func (m *Multi) GetReqName() string {
 	if m.Req.Name == "" {
 		return m.Handler + "Req"
 	}
 	return m.Req.Name
 }
 
-func (m *Muilt) GetRespName() string {
+func (m *Multi) GetRespName() string {
 	if m.Resp.Name == "" {
 		return m.Handler + "Resp"
 	}

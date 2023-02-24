@@ -1,4 +1,4 @@
-package server
+package url
 
 import (
 	"testing"
@@ -17,7 +17,7 @@ func TestTakeURL(t *testing.T) {
 		{Data: "https://host/im/api", Need: "/im/api", IsTemplate: false},
 		{Data: "https://{{.Host}}/im/{{.Action}}", Need: "/im/:Action", IsTemplate: true},
 	} {
-		got := TakeURL(v.Data, v.IsTemplate)
+		got := TakePath(v.Data, v.IsTemplate)
 		assert.Equal(t, got, v.Need)
 	}
 }

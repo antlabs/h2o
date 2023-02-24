@@ -14,7 +14,7 @@ init:
       OrgName:  ""
       AppName: ""
 
-muilt:
+multi:
 - handler: AppToken.CreateAppToken
   req:
     method: POST

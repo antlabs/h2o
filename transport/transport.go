@@ -49,7 +49,7 @@ func (t *Transport) SubMain() {
 
 		tmplMain.PackageNameSlice = append(tmplMain.PackageNameSlice, c.Package)
 		tmplServer.PackageName = c.Package
-		for _, h := range c.Muilt {
+		for _, h := range c.Multi {
 
 			h.ModifyHandler()
 

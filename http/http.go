@@ -10,6 +10,7 @@ import (
 	"github.com/antlabs/h2o/http/types"
 	"github.com/antlabs/h2o/internal/gomod"
 	"github.com/antlabs/h2o/internal/save"
+	h2ourl "github.com/antlabs/h2o/internal/url"
 	"github.com/antlabs/h2o/model"
 	"github.com/antlabs/h2o/parser"
 	"github.com/antlabs/h2o/pyaml"
@@ -63,7 +64,7 @@ func (h *HTTP) SubMain() {
 			handlerDir = save.MkdirAndClean(getHandlerPrefix(hp.Dir, c.Package))
 		}
 
-		for _, h := range c.Muilt {
+		for _, h := range c.Multi {
 
 			h.ModifyHandler()
 			handler := h.Handler
@@ -165,7 +166,7 @@ func (h *HTTP) SubMain() {
 				routes.AllRoute = append(routes.AllRoute,
 					server.Routes{
 						Method:         h.Req.Method,
-						Path:           server.TakeURL(h.Req.URL, h.Req.Template.URL),
+						Path:           h2ourl.TakePath(h.Req.URL, h.Req.Template.URL),
 						SubPackageName: c.Package,
 						Handler:        handler,
 					})

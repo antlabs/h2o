@@ -48,7 +48,7 @@ func (b *Pb) SubMain() {
 			URLName:  urlName,
 		}
 
-		for _, h := range c.Muilt {
+		for _, h := range c.Multi {
 
 			h.ModifyHandler()
 

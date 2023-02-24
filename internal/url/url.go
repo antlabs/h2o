@@ -1,4 +1,4 @@
-package server
+package url
 
 import "strings"
 
@@ -7,7 +7,7 @@ const (
 	http  = "http"
 )
 
-func TakeURL(u string, isTemplate bool) string {
+func TakePath(u string, isTemplate bool) string {
 	if strings.HasPrefix(u, https) {
 		u = u[len(https)+1:]
 	} else if strings.HasPrefix(u, http) {
@@ -22,6 +22,11 @@ func TakeURL(u string, isTemplate bool) string {
 		return u
 	}
 
+	u = strings.ReplaceAll(u, "{{.", ":")
+	return strings.ReplaceAll(u, "}}", "")
+}
+
+func TakeURL(u string) string {
 	u = strings.ReplaceAll(u, "{{.", ":")
 	return strings.ReplaceAll(u, "}}", "")
 }

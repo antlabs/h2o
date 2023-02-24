@@ -16,7 +16,7 @@ init:
       UserName: ""
       Msg_id: ""
       Owner_username: ""
-muilt:
+multi:
 # 1. 设置用户属性
 # http://docs-im-beta.easemob.com/document/server-side/userprofile.html#%E8%AE%BE%E7%BD%AE%E7%94%A8%E6%88%B7%E5%B1%9E%E6%80%A7
 - handler: Users.CreateUserMetadata

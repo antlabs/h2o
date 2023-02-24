@@ -15,7 +15,7 @@ import (
 	"github.com/antlabs/tostruct/protobuf"
 )
 
-func GetBody(h model.Muilt, isProtobuf bool) (reqBody Body, defReqBody []model.KeyVal[string, string], respBody Body, err error) {
+func GetBody(h model.Multi, isProtobuf bool) (reqBody Body, defReqBody []model.KeyVal[string, string], respBody Body, err error) {
 
 	newReqType := h.Req.NewType
 	if isProtobuf {
@@ -47,7 +47,7 @@ func GetBody(h model.Muilt, isProtobuf bool) (reqBody Body, defReqBody []model.K
 	return
 }
 
-func GetHeader(h model.Muilt, opt ...option.OptionFunc) (reqHeader Header, defReqHeader []model.KeyVal[string, string],
+func GetHeader(h model.Multi, opt ...option.OptionFunc) (reqHeader Header, defReqHeader []model.KeyVal[string, string],
 	respHeader Header, defRespHeader []model.KeyVal[string, string], err error) {
 
 	reqHeader, defReqHeader, err = getHeader(h.Req.Name+"Header", h.Req.Header, h.Req.UseDefault.Header, opt...)

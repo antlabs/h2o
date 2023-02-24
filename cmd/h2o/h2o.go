@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/antlabs/h2o/codemsg"
+	"github.com/antlabs/h2o/curl"
 	"github.com/antlabs/h2o/http"
 	"github.com/antlabs/h2o/pb"
 	"github.com/antlabs/h2o/transport"
@@ -80,6 +81,8 @@ type H2O struct {
 	PB pb.Pb `clop:"subcommand" usage:"gen protobuf code"`
 	//transport
 	Transport transport.Transport `clop:"subcommand" usage:"transport"`
+	// curl， 生成curl命令
+	Curl curl.Curl `clop:"subcommand" usage:"gen curl command"`
 }
 
 func main() {
