@@ -6,7 +6,7 @@ require (
 	github.com/Masterminds/sprig/v3 v3.2.3
 	github.com/antlabs/deepcopy v0.0.6
 	github.com/antlabs/gstl v0.0.6
-	github.com/antlabs/tostruct v0.0.6
+	github.com/antlabs/tostruct v0.0.7
 	github.com/gobeam/stringy v0.0.5
 	github.com/guonaihong/clop v0.2.9
 	github.com/stretchr/testify v1.8.1
