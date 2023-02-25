@@ -1,5 +1,10 @@
 # h2o
-脚手架工具，统一的dsl，方便生成一些代码
+脚手架工具，统一的dsl，方便生成一些代码, 静态MVC。持有model，其余的就是交给h2o生成代码。最多写写logic
+目前可以直接生成的代码有:
+1. http client：实现一个第三方sdk，so easy
+2. http server：实现服务再不用纠结结构体的定义
+3. curl 命令： 方便自测和api交流
+4. protobuf定义: 从json或者yaml生成
 
 ## Install
 ```bash
@@ -8,6 +13,7 @@ go install github.com/antlabs/h2o/cmd/h2o@latest
 ## 命令行
 * codemsg: 用于生成错误码相关代码
 * http: 生成http client 和http server(代码)
+* curl: 生成curl命令
 * jsonstruct: 字符串转golang struct定义
 * yamlstruct: 字符串转golang struct定义
 * pb: dsl生成protobuf定义
@@ -20,9 +26,11 @@ Options:
 
 Subcommand:
     codemsg       Generate code in codemsg format from constants
+    curl          gen curl command
     http          gen http code
     jsonstruct    Generate structure from json
     pb            gen protobuf code
+    transport     transport
     yamlstruct    Generate structure from yaml
 ```
 ## json 子命令

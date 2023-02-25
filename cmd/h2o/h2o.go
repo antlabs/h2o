@@ -12,6 +12,7 @@ import (
 	"github.com/antlabs/h2o/transport"
 	"github.com/antlabs/tostruct/json"
 	"github.com/antlabs/tostruct/option"
+	"github.com/antlabs/tostruct/protobuf"
 	"github.com/antlabs/tostruct/yaml"
 	"github.com/guonaihong/clop"
 )
@@ -22,6 +23,7 @@ type JSON struct {
 	From       string `clop:"short;long" usage:"which file to open from? If it is -, it means reading from stdin"`
 	StructName string `clop:"short;long" usage:"Control the name of the generated structure"`
 	yaml       bool
+	protobuf   bool
 }
 
 func (j *JSON) SubMain() {
@@ -44,6 +46,8 @@ func (j *JSON) SubMain() {
 
 	if j.yaml {
 		all, err = yaml.Marshal(all, opt...)
+	} else if j.protobuf {
+		all, err = protobuf.Marshal(all, opt...)
 	} else {
 		all, err = json.Marshal(all, opt...)
 	}
@@ -67,16 +71,27 @@ func (y *YAML) SubMain() {
 
 }
 
+type Protobuf struct {
+	JSON
+}
+
+func (p *Protobuf) SubMain() {
+	p.JSON.protobuf = true
+	p.JSON.SubMain()
+}
+
 // 主命令
 type H2O struct {
 	// 子命令，入口函数是SubMain
 	JSONStruct JSON `clop:"subcommand" usage:"Generate structure from json"`
 	// 子命令，入口函数是SubMain
 	YAMLStruct YAML `clop:"subcommand" usage:"Generate structure from yaml"`
+	// 子命令，入口函数是SubMain
+	ProtobufMsg Protobuf `clop:"subcommand" usage:"Generate protobuf message from json or yaml"`
 	//子命令， 入口是SubMain
 	CodeMsg codemsg.CodeMsg `clop:"subcommand" usage:"Generate code in codemsg format from constants"`
 	// 子命令，生成http客户端代码和http服务端代码(TODO)
-	HTTP http.HTTP `clop:"subcommand" usage:"gen http code"`
+	HTTP http.HTTP `clop:"subcommand" usage:"gen http code(client and server)"`
 	//子命令，生成protobuf
 	PB pb.Pb `clop:"subcommand" usage:"gen protobuf code"`
 	//transport
