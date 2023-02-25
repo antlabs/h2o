@@ -32,6 +32,10 @@ func (j *JSON) SubMain() {
 		opt = append(opt, option.WithNotInline())
 	}
 
+	if len(j.StructName) > 0 {
+		opt = append(opt, option.WithStructName(j.StructName))
+	}
+
 	var all []byte
 	var err error
 	if j.From == "-" {
