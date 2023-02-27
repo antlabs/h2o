@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
-	"io"
 	"os"
 
+	"github.com/antlabs/h2o/ast"
 	"github.com/antlabs/h2o/codemsg"
 	"github.com/antlabs/h2o/curl"
 	"github.com/antlabs/h2o/http"
+	"github.com/antlabs/h2o/internal/file"
 	"github.com/antlabs/h2o/pb"
 	"github.com/antlabs/h2o/transport"
 	"github.com/antlabs/tostruct/json"
@@ -38,11 +39,8 @@ func (j *JSON) SubMain() {
 
 	var all []byte
 	var err error
-	if j.From == "-" {
-		all, err = io.ReadAll(os.Stdin)
-	} else {
-		all, err = os.ReadFile(j.From)
-	}
+
+	all, err = file.ReadFile(j.From)
 	if err != nil {
 		fmt.Printf("open %s fail:%s\n", j.From, err)
 		return
@@ -102,6 +100,8 @@ type H2O struct {
 	Transport transport.Transport `clop:"subcommand" usage:"transport"`
 	// curl， 生成curl命令
 	Curl curl.Curl `clop:"subcommand" usage:"gen curl command"`
+	// ast , 打印golang 的ast
+	Ast ast.Ast `clop:"subcommand" usage:"print ast"`
 }
 
 func main() {
