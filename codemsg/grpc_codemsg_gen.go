@@ -17,6 +17,7 @@ type GrpcCodeMsgTmpl struct {
 	MsgName      string // 修改Message 字段的名字
 	Args         string // os.Args[2:]
 	OriginalName string //
+	StringMethod string // String函数名
 	AllVariable  []Value
 }
 

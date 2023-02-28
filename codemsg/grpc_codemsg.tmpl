@@ -4,10 +4,12 @@ package {{.PkgName}}
 
 import(
 	"google.golang.org/grpc/status"
+	"google.golang.org/grpc/codes"
 )
 
 var (
+{{$StringMethod := .StringMethod}}
 {{range $_, $value := .AllVariable}}
-  ErrGRPC{{$value.OriginalName}} error = status.Error({{.OriginalName}}, {{.OriginalName}}.String()) //{{$value.Name}}
+  ErrGRPC{{$value.OriginalName}} error = status.Error(codes.Code({{.OriginalName}}), {{.OriginalName}}.{{$StringMethod}} ()) //{{$value.Name}}
 {{end}}
 )

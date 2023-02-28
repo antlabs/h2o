@@ -107,7 +107,7 @@ func (g *Generator) generateCodeMsg(c *CodeMsg, typeName string) {
 
 	if c.Grpc {
 
-		grpcTmpl := GrpcCodeMsgTmpl{AllVariable: values, TypeName: typeName}
+		grpcTmpl := GrpcCodeMsgTmpl{AllVariable: values, TypeName: typeName, StringMethod: c.StringMethod}
 		deepcopy.Copy(&grpcTmpl, c).Do()
 		grpcTmpl.Args = strings.Join(os.Args[2:], " ")
 		grpcTmpl.PkgName = g.pkg.name
