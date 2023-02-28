@@ -129,4 +129,6 @@ var (
 ```bash
 ./h2o codemsg --code-msg --linecomment --string --type ErrNo ./testdata/err.go
 // 如果要修改生成的String方法名， 可以通过--string-method String2  选项
+// 如果要生成grpc的错误就用下面的命令
+// h2o codemsg --code-msg --linecomment --type ErrNo ./testdata/err.go --grpc --string-method string2 --string
 ```
