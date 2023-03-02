@@ -40,9 +40,9 @@ func {{.Handler}}Handler(svcCtx *svc.ServiceContext) gin.HandlerFunc {
 		l := {{.SubPackageName}}.New{{.Handler}}Logic(c, svcCtx)
 		resp, err := l.{{.Handler}}(&req)
 		if err != nil {
-			c.JSON(500, resp)
+			c.JSON(500, resp.Body)
 		} else {
-			c.JSON(200, resp)
+			c.JSON(200, resp.Body)
 		}
 	}
 }
