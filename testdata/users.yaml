@@ -7,7 +7,7 @@ init:
   handler: New #函数名, 名字是New认识是构造函数
   #req:
     #field:   #TODO
-  resp:
+  rvStruct:
     name: Users #返回的结构体名
     field:
       Host: a1.easemob.com
@@ -322,7 +322,7 @@ multi:
 - handler: Users.ModifyUserPassword
   req:
     name: ModifyUserPasswordReq
-    url: https://{{.Host}}/{{.OrgName}}/{.AppName}/users/{{.UserName}}
+    url: https://{{.Host}}/{{.OrgName}}/{{.AppName}}/users/{{.UserName}}/password
     template:
       url: true
     method: PUT

@@ -15,9 +15,9 @@ type Protobuf struct {
 }
 
 type Init struct {
-	Handler string   `yaml:"handler"`
-	Req     InitReq  `yaml:"req"`
-	Resp    InitResp `yaml:"resp"`
+	Handler  string   `yaml:"handler"`
+	Args     InitReq  `yaml:"args"`
+	RvStruct InitResp `yaml:"rvStruct"`
 }
 
 type InitReq struct {

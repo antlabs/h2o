@@ -48,9 +48,9 @@ func (h *HTTP) SubMain() {
 
 		tmplClient := client.ClientTmpl{
 			PackageName:  c.Package,
-			InitField:    c.Init.Resp.Field,
-			StructName:   c.Init.Resp.Name,
-			ReceiverName: strings.ToLower(string(c.Init.Resp.Name[0])),
+			InitField:    c.Init.RvStruct.Field,
+			StructName:   c.Init.RvStruct.Name,
+			ReceiverName: strings.ToLower(string(c.Init.RvStruct.Name[0])),
 		}
 
 		tmplClientType := pyaml.TypeTmpl{PackageName: c.Package}

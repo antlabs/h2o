@@ -64,7 +64,7 @@ func (t *Transport) SubMain() {
 
 				tmpl := transportGoZeroHTTPClientTmpl{
 					SvcName:           gomod + "/internal/svc",
-					URLStruct:         c.Init.Resp.Name,
+					URLStruct:         c.Init.RvStruct.Name,
 					PackageName:       c.Package,
 					GoZeroBaseURL:     t.FromBaseURL,
 					HTTPClientBaseURL: t.ToBaseURL}

@@ -1,0 +1,63 @@
+---
+package: "chatgroups"
+protobuf:
+  package: "chatgroups.v1"
+  go_package: "./pb/v1/im/chatgroups"
+init:
+  handler: New #函数名, 名字是New认识是构造函数
+  args:
+    #field:   #TODO
+  rvStruct:
+    name: chatgroups #返回的结构体名
+    field:
+      Host: a1.easemob.com 
+      OrgName:  ""
+      AppName: ""
+      GroupID: ""
+
+multi:
+- handler: chatgroups.GetChatGroups
+  req:
+    method: GET
+    url: https://{{.Host}}/{{.OrgName}}/{{.AppName}}/chatgroups/{{.GroupID}}
+    template:
+      url: true
+    # 直接使用配置文件里面的值
+    useDefault:
+      header:
+      - Content-Type
+      - Accept
+      body:
+    header:
+    - 'Content-Type: application/json'
+    - 'Accept: application/json'
+    encode: 
+      body:
+    body:
+
+  resp:
+    newType:
+    body:
+      action: get
+      application: '09eXXXX34'
+      applicationName: chatdemoui
+      count: 1
+      data:
+      - id: 18XXXX3
+        name: XXXX
+        description: test
+        membersonly: false
+        allowinvites: false
+        maxusers: 300
+        owner: yifan2
+        created: 1656062986845
+        custom: ''
+        mute: false
+        affiliations_count: 1
+        disabled: false
+        public: true
+        permission: owner
+      duration: 2
+      organization: XXXX
+      timestamp: 1656063062633
+      uri: http://XXXX.com/XXXX/chatdemoui/chatgroups/18XXXX3

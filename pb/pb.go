@@ -28,7 +28,7 @@ func (b *Pb) SubMain() {
 			return
 		}
 
-		urlName := c.Init.Resp.Name + "URL"
+		urlName := c.Init.RvStruct.Name + "URL"
 		tmplType := newPbType(pyaml.TypeTmpl{PackageName: c.Package}, urlName)
 
 		packageName := c.Package
@@ -44,7 +44,7 @@ func (b *Pb) SubMain() {
 		tmplPb := PbTmpl{
 			GoPackageName: goPackageName,
 			PackageName:   packageName, ServiceName: c.Package,
-			URLField: mapex.SortKeys(c.Init.Resp.Field),
+			URLField: mapex.SortKeys(c.Init.RvStruct.Field),
 			URLName:  urlName,
 		}
 

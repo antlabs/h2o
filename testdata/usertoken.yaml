@@ -7,7 +7,7 @@ init:
   handler: New #函数名, 名字是New认识是构造函数
   #req:
     #field:   #TODO
-  resp:
+  rvStruct:
     name: UserToken #返回的结构体名
     field:
       Host:  a1.easemob.com 
