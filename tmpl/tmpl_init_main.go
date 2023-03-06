@@ -14,7 +14,7 @@ type Tmpl struct {
 	PackageName string `clop:"short;long" usage:"package name" default:"demo"`
 	SaveFile    bool   `clop:"short;long" usage:"save to file"`
 	Dir         string `clop:"short;long" usage:"dir" default:"."`
-	Dsl         bool   `clop:"long" useage:"init dsl tmpl"`
+	Dsl         bool   `clop:"long" usage:"init dsl tmpl"`
 }
 
 func (t *Tmpl) initDsl() {
