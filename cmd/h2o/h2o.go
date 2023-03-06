@@ -10,6 +10,7 @@ import (
 	"github.com/antlabs/h2o/http"
 	"github.com/antlabs/h2o/internal/file"
 	"github.com/antlabs/h2o/pb"
+	"github.com/antlabs/h2o/tmpl"
 	"github.com/antlabs/h2o/transport"
 	"github.com/antlabs/tostruct/json"
 	"github.com/antlabs/tostruct/option"
@@ -102,6 +103,8 @@ type H2O struct {
 	Curl curl.Curl `clop:"subcommand" usage:"gen curl command"`
 	// ast , 打印golang 的ast
 	Ast ast.Ast `clop:"subcommand" usage:"print ast"`
+	// tmpl, 初始化各种模板
+	Tmpl tmpl.Tmpl `clop:"subcommand" usage:"tmplate init"`
 }
 
 func main() {

@@ -1,0 +1,45 @@
+---
+package: "{{.PackageName}}"
+protobuf:
+  package: "{{.PackageName}}.v1"
+  go_package: "./pb/v1/{{.PackageName}}"
+init:
+  handler: New #函数名, 名字是New认识是构造函数
+  #req:
+    #field:   #TODO
+  rvStruct:
+    name: {{.StructName}} #返回的结构体名
+    field:
+      #Host: 
+
+multi:
+- handler: {{.StructName}}.Create{{.StructName}}
+  req:
+    method: POST
+    url: https://host/port
+    template:
+      url: false
+    # 直接使用配置文件里面的值
+    useDefault:
+      header:
+      #- Content-Type
+      #- Accept
+      body:
+        #- .grant_type
+    header:
+    - 'Content-Type: application/json'
+    - 'Accept: application/json'
+    encode: 
+      body:
+    body:
+     #grant_type: client_credentials
+     #client_id: YXA6i-Ak8Ol4Eei2l11ZjV-EAg
+     #client_secret: YXA6VunqiNxoB7IwXHInk1cGiXOOJfc
+     #ttl: '1024000'
+
+  resp:
+    newType:
+    body:
+     #access_token: YWMte3bGuOukEeiTkNP4grL7iwAAAAAAAAAAAAAAAAAAAAGL4CTw6XgR6LaXXVmNX4QCAgMAAAFnKdc-ZgBPGgBFTrLhhyK8woMEI005emtrLJFJV6aoxsZSioSIZkr5kw
+     #expires_in: 1024000
+     #application: 8be024f0-e978-11e8-b697-5d598d5f8402

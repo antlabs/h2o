@@ -73,7 +73,7 @@ func getBody(bodyName string, bodyData any, newType map[string]string, encode mo
 
 	tagName := "json"
 	if encode.Body == model.WWWForm {
-		tagName = "form"
+		tagName = "www-form"
 	}
 
 	getVal := make(map[string]any)
