@@ -97,6 +97,7 @@ func ({{$ReceiverName}} *{{$StructName}}) {{$value.HandlerName}}Ctx(ctx context.
   SetJSON(req.Body)
   {{- end}}{{end}}.
   WithContext(ctx).
+  {{- if .HaveRespBody}}
   Callback(func(c *gout.Context) (err error) {
 
     switch {
@@ -107,7 +108,7 @@ func ({{$ReceiverName}} *{{$StructName}}) {{$value.HandlerName}}Ctx(ctx context.
     }
     code = c.Code
     return nil
-  }).
+  }).{{end}}
   Do()
   if err != nil {
     return nil,err

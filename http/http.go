@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/antlabs/deepcopy"
 	"github.com/antlabs/h2o/http/client"
 	"github.com/antlabs/h2o/http/server"
 	"github.com/antlabs/h2o/http/types"
@@ -14,9 +15,14 @@ import (
 	"github.com/antlabs/h2o/model"
 	"github.com/antlabs/h2o/parser"
 	"github.com/antlabs/h2o/pyaml"
+	"github.com/antlabs/pcurl"
+	"github.com/antlabs/pcurl/body"
 	"github.com/antlabs/tostruct/option"
 	"github.com/antlabs/tostruct/url"
 )
+
+// 错误处理风格
+// h2o 是代码生成器，有错误可以直接panic，这和服务端处理逻辑不一样
 
 // 1.生成客户端代码, OK
 // h2o http -f ./testdata/dst.yaml --client
@@ -66,6 +72,26 @@ func (h *HTTP) SubMain() {
 
 		for _, h := range c.Multi {
 
+			if len(h.Req.Curl) > 0 {
+				reqObj, err := pcurl.ParseAndObj(h.Req.Curl)
+				if err != nil {
+					panic(err.Error()) //提前报错，让用户修复下数据
+				}
+
+				if err := deepcopy.Copy(&h.Req, reqObj).Do(); err != nil {
+					panic(err.Error())
+				}
+			}
+
+			if h.Resp.Body != nil {
+				if s, ok := h.Resp.Body.(string); ok {
+					_, o, err := body.Unmarshal([]byte(s))
+					if err != nil {
+						panic(err.Error())
+					}
+					h.Resp.Body = o
+				}
+			}
 			h.ModifyHandler()
 			handler := h.Handler
 			// 去除前面的包名, TODO 没有如果点就是普通函数
@@ -160,6 +186,7 @@ func (h *HTTP) SubMain() {
 				HaveQuery:    hasQuery,
 				HaveHeader:   hasHeader,
 				HaveReqBody:  hasJSONBody,
+				HaveRespBody: len(respBody.StructType) > 0,
 			})
 
 			if hp.Server {

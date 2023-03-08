@@ -35,6 +35,7 @@ type Func struct {
 	HaveHeader   bool   //有http header
 	HaveQuery    bool   //有查询字符串
 	HaveReqBody  bool   //有请求body
+	HaveRespBody bool   //有请求body
 	ReqWWWForm   bool   //www form 编码
 	ReqName      string //函数请求参数名
 	RespName     string //函数响应参数名
