@@ -71,10 +71,15 @@ type Template struct {
 	URL bool `yaml:"url"`
 }
 
+type UsePtr struct {
+	Body []string `yaml:"body"`
+}
+
 type Req struct {
 	Encode          Encode            `yaml:"encode"`
 	URL             string            `yaml:"url"`
 	Curl            string            `yaml:"curl"`
+	UsePtr          UsePtr            `yaml:"usePtr"`
 	Template        Template          `yaml:"template"`
 	Name            string            `yaml:"name"`
 	NewType         map[string]string `yaml:"newType"`

@@ -15,8 +15,13 @@ init:
 multi:
 - handler: {{.StructName}}.Create{{.StructName}}
   req:
-    method: POST
-    url: https://host/port
+    # 必填字段，例 method: POST
+    method: 
+    curl: >-
+
+    # 必填字段
+    # url: https://host/port
+    url: 
     template:
       url: false
     # 直接使用配置文件里面的值

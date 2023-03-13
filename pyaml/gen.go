@@ -26,7 +26,10 @@ func GetBody(h model.Multi, isProtobuf bool) (reqBody Body, defReqBody []model.K
 		h.Req.Body,
 		newReqType,
 		h.Req.Encode,
-		h.Req.UseDefault.Body, isProtobuf)
+		h.Req.UseDefault.Body,
+		isProtobuf,
+		h.Req.UsePtr.Body,
+	)
 	if err != nil {
 		fmt.Printf("get request body:%s\n", err)
 		return
@@ -37,7 +40,7 @@ func GetBody(h model.Multi, isProtobuf bool) (reqBody Body, defReqBody []model.K
 		newRespType = h.Resp.NewProtobufType
 	}
 
-	respBody, _, err = getBody(h.Resp.Name, h.Resp.Body, newRespType, model.Encode{}, nil, isProtobuf)
+	respBody, _, err = getBody(h.Resp.Name, h.Resp.Body, newRespType, model.Encode{}, nil, isProtobuf, nil)
 	if err != nil {
 		fmt.Printf("get response body:%s \n", err)
 		all, _ := stdjson.Marshal(h.Resp.Body)
@@ -64,7 +67,7 @@ func GetHeader(h model.Multi, opt ...option.OptionFunc) (reqHeader Header, defRe
 	return
 }
 
-func getBody(bodyName string, bodyData any, newType map[string]string, encode model.Encode, bodyDefKey []string, isProtobuf bool) (
+func getBody(bodyName string, bodyData any, newType map[string]string, encode model.Encode, bodyDefKey []string, isProtobuf bool, useBodyPtr []string) (
 	body Body,
 	rvDefaultBody []model.KeyVal[string, string],
 	err error) {
@@ -88,24 +91,29 @@ func getBody(bodyName string, bodyData any, newType map[string]string, encode mo
 		if isProtobuf {
 			data, err = protobuf.Marshal(v,
 				option.WithStructName(body.Name),
-				option.WithSpecifyType(newType))
+				option.WithSpecifyType(newType),
+				option.WithUsePtrType(useBodyPtr),
+			)
 		} else {
 			data, err = json.Marshal(v,
 				option.WithStructName(body.Name),
 				option.WithTagName(tagName),
 				option.WithSpecifyType(newType),
+				option.WithUsePtrType(useBodyPtr),
 				option.WithGetRawValue(getVal))
 		}
 	case []any:
 		if isProtobuf {
 			data, err = protobuf.Marshal(v,
 				option.WithStructName(body.Name),
+				option.WithUsePtrType(useBodyPtr),
 				option.WithSpecifyType(newType),
 			)
 		} else {
 			data, err = json.Marshal(v,
 				option.WithStructName(body.Name),
 				option.WithTagName(tagName),
+				option.WithUsePtrType(useBodyPtr),
 				option.WithSpecifyType(newType),
 				option.WithGetRawValue(getVal))
 		}

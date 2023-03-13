@@ -37,6 +37,7 @@ type HTTP struct {
 	Client bool     `clop:"short;long" usage:"gen http client code"`
 	Server bool     `clop:"short;long" usage:"gen http server code"`
 	Dir    string   `clop:"short;long" usage:"gen dir" default:"."`
+	Debug  bool     `clop:"long" usage:"debug mode"`
 }
 
 // 入口函数
@@ -105,6 +106,11 @@ func (h *HTTP) SubMain() {
 				panic("req name is empty")
 			}
 			var query pyaml.Query
+			if hp.Debug {
+				fmt.Printf("resp:%#v\n", h.Resp.Body)
+				fmt.Printf("req.Query:%#v\n", h.Req.URL)
+			}
+
 			if len(h.Req.URL) > 0 {
 				query.Name = h.Req.Name + "Query"
 				if pos := strings.Index(h.Req.URL, "?"); pos != -1 {
