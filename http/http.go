@@ -42,14 +42,13 @@ type HTTP struct {
 
 // 入口函数
 func (h *HTTP) SubMain() {
-
 	goModName := gomod.GetGoModuleName(h.Dir)
 	routes := server.RoutesTmpl{GoMod: goModName}
 	for _, f := range h.File {
 
 		c, err := parser.Parser(f)
 		if err != nil {
-			fmt.Printf("h2o.HTTP.parser %s\n", err)
+			fmt.Printf("h2o.HTTP.parser %s, filename(%s)\n", err, f)
 			return
 		}
 
@@ -76,7 +75,7 @@ func (h *HTTP) SubMain() {
 			if len(h.Req.Curl) > 0 {
 				reqObj, err := pcurl.ParseAndObj(h.Req.Curl)
 				if err != nil {
-					panic(err.Error()) //提前报错，让用户修复下数据
+					panic(err.Error()) // 提前报错，让用户修复下数据
 				}
 
 				if err := deepcopy.Copy(&h.Req, reqObj).Do(); err != nil {
@@ -117,7 +116,7 @@ func (h *HTTP) SubMain() {
 					// dst.yaml里面的字符串带{}两种花括号。直接使用解析这样的url会报错。给个默认正确的host，就可以得到query string
 					urlStr := "www.qq.com?" + h.Req.URL[pos+1:]
 					all, err := url.Marshal(urlStr, option.WithStructName(query.Name), option.WithTagName("query"))
-					h.Req.URL = h.Req.URL[:pos] //删除原始url里面的query string, 这里已经通过SetQuery里面传过来了
+					h.Req.URL = h.Req.URL[:pos] // 删除原始url里面的query string, 这里已经通过SetQuery里面传过来了
 					query.StructType = string(all)
 					if err != nil {
 						fmt.Printf("marshal query string fail:%s\n", err)
@@ -143,13 +142,14 @@ func (h *HTTP) SubMain() {
 
 				save.TmplFile(getHandlerName(handlerDir, handler), true, func() []byte {
 					var buf bytes.Buffer
-					handlerTmpl := server.HandlerTmpl{SubPackageName: c.Package,
-						GoMod:       goModName,
-						Handler:     handler,
-						ReqName:     h.Req.Name,
-						HasQuery:    hasQuery,
-						HasHeader:   hasHeader,
-						HasJSONBody: hasJSONBody,
+					handlerTmpl := server.HandlerTmpl{
+						SubPackageName: c.Package,
+						GoMod:          goModName,
+						Handler:        handler,
+						ReqName:        h.Req.Name,
+						HasQuery:       hasQuery,
+						HasHeader:      hasHeader,
+						HasJSONBody:    hasJSONBody,
 					}
 					handlerTmpl.Gen(&buf)
 					return buf.Bytes()
@@ -281,5 +281,4 @@ func (h *HTTP) SubMain() {
 			return typeBuf.Bytes()
 		})
 	}
-
 }
