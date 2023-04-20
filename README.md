@@ -1,4 +1,7 @@
 # h2o
+[![Go](https://github.com/antlabs/h2o/workflows/Go/badge.svg)](https://github.com/antlabs/h2o/actions)
+[![codecov](https://codecov.io/gh/antlabs/h2o/branch/master/graph/badge.svg)](https://codecov.io/gh/antlabs/h2o)
+
 脚手架工具，统一的dsl，方便生成一些代码, 静态MVC。持有model，其余的就是交给h2o生成代码。最多写写logic
 目前可以直接生成的代码有:
 1. http client：实现一个第三方sdk，so easy
