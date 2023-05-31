@@ -40,6 +40,18 @@ type HTTP struct {
 	Debug  bool     `clop:"long" usage:"debug mode"`
 }
 
+var exampleYaml = `
+package: "apptoken" #包名
+protobuf:
+  package: "apptoken.v1"
+  go_package: "./pb/v1/im/apptoken" #给protobuf使用
+init:
+  handler: New #函数名, 名字是New默认是构造函数
+  rvStruct:
+    name: AppToken #返回的结构体名
+
+`
+
 // 入口函数
 func (h *HTTP) SubMain() {
 	goModName := gomod.GetGoModuleName(h.Dir)
@@ -52,11 +64,20 @@ func (h *HTTP) SubMain() {
 			return
 		}
 
-		tmplClient := client.ClientTmpl{
-			PackageName:  c.Package,
-			InitField:    c.Init.RvStruct.Field,
-			StructName:   c.Init.RvStruct.Name,
-			ReceiverName: strings.ToLower(string(c.Init.RvStruct.Name[0])),
+		var tmplClient client.ClientTmpl
+		if h.Client {
+			if len(c.Init.RvStruct.Name) == 0 {
+				// rvStruct.Name 不能为空
+				fmt.Printf("rvStruct name is empty:\n%s\n", exampleYaml)
+				continue
+			}
+
+			tmplClient = client.ClientTmpl{
+				PackageName:  c.Package,
+				InitField:    c.Init.RvStruct.Field,
+				StructName:   c.Init.RvStruct.Name,
+				ReceiverName: strings.ToLower(string(c.Init.RvStruct.Name[0])),
+			}
 		}
 
 		tmplClientType := pyaml.TypeTmpl{PackageName: c.Package}
