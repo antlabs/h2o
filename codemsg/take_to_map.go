@@ -63,7 +63,7 @@ func saveTakeFileMap(dir, packageName, types string, mapName string, m map[int]b
 	}
 	sourceCode, err := format.Source(buf.Bytes())
 	if err != nil {
-		panic(err)
+		panic(string(buf.Bytes()))
 	}
 
 	err = os.WriteFile(fileName, sourceCode, 0o644)

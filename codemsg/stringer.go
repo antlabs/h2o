@@ -464,19 +464,22 @@ func (f *File) genDecl(node ast.Node) bool {
 				mapName := ""
 				var err error
 				v.Name, mapName, err = parseTakeCodeToMap(v.Name)
-				if err != nil {
-					panic(err)
-				}
-				if f.c.SaveCodeToMap == nil {
-					f.c.SaveCodeToMap = make(map[string]map[int]bool)
-				}
+				if len(mapName) > 0 {
 
-				saveMap := f.c.SaveCodeToMap[mapName]
-				if saveMap == nil {
-					saveMap = make(map[int]bool)
+					if err != nil {
+						panic(err)
+					}
+					if f.c.SaveCodeToMap == nil {
+						f.c.SaveCodeToMap = make(map[string]map[int]bool)
+					}
+
+					saveMap := f.c.SaveCodeToMap[mapName]
+					if saveMap == nil {
+						saveMap = make(map[int]bool)
+					}
+					saveMap[int(v.value)] = true
+					f.c.SaveCodeToMap[mapName] = saveMap
 				}
-				saveMap[int(v.value)] = true
-				f.c.SaveCodeToMap[mapName] = saveMap
 			}
 
 			f.values = append(f.values, v)
