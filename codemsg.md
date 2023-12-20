@@ -95,6 +95,9 @@ var (
 
 ### 二、提取某些code到指定的map里面 
 主要是过滤一些code，比如对错误进行分级的使用场景, 有些错误非服务端引起。需要忽略这些错误
+
+用法是` @TakeCodeToMap(InfoMap)`， 圆括号里面是你给map的命名
+
 2.1 命令
 ```go
 h2o codemsg --code-msg --linecomment --type ErrNo --take-code-to-map ./testdata/err.go
