@@ -95,15 +95,16 @@ type CodeMsg struct {
 	Grpc              bool   `clop:"long" usage:"Generate grpc error type"`
 	StringMethod      string `clop:"long" usage:"String function name" default:"String"`
 	String            bool   `clop:"long" usage:"Generate string function"`
-	CodeMsgStructName string `clop:"long" usage:"turn on the ability to generate codemsg code" default:"CodeMsg"` //TODO
+	CodeMsgStructName string `clop:"long" usage:"turn on the ability to generate codemsg code" default:"CodeMsg"` // TODO
 
-	CodeName string   `clop:"long" usage:"set new code name" default:"Code"`
-	MsgName  string   `clop:"long" usage:"set new message name" default:"Message"`
-	Args     []string `clop:"args=file" usage:"file or dir" default:"["."]"`
+	CodeName      string   `clop:"long" usage:"set new code name" default:"Code"`
+	MsgName       string   `clop:"long" usage:"set new message name" default:"Message"`
+	TakeCodeToMap bool     `clop:"long" usage:"Enable the take to map feature"`
+	Args          []string `clop:"args=file" usage:"file or dir" default:"["."]"`
+	SaveCodeToMap map[string]map[int]bool
 }
 
 func genString(c *CodeMsg) {
-
 	log.SetFlags(0)
 	log.SetPrefix("h2o codemsg: ")
 
@@ -187,6 +188,7 @@ type File struct {
 
 	trimPrefix  string
 	lineComment bool
+	c           *CodeMsg
 }
 
 type Package struct {
@@ -239,7 +241,6 @@ func (g *Generator) addPackage(pkg *packages.Package) {
 
 // generate produces the String method for the named type.
 func (g *Generator) generate(typeName string, c *CodeMsg) {
-
 	values := make([]Value, 0, 100)
 
 	for _, file := range g.pkg.files {
@@ -247,6 +248,10 @@ func (g *Generator) generate(typeName string, c *CodeMsg) {
 		// Set the state for this run of the walker.
 		file.typeName = typeName
 		file.values = nil
+		file.c = c
+		if file.c == nil {
+			panic("codemsg is nil")
+		}
 		if file.file != nil {
 			ast.Inspect(file.file, file.genDecl)
 			values = append(values, file.values...)
@@ -450,82 +455,34 @@ func (f *File) genDecl(node ast.Node) bool {
 			} else {
 				v.Name = strings.TrimPrefix(v.OriginalName, f.trimPrefix)
 			}
+
+			if f.c == nil {
+				panic("f.c is nil")
+			}
+
+			if f.c.TakeCodeToMap {
+				mapName := ""
+				var err error
+				v.Name, mapName, err = parseTakeCodeToMap(v.Name)
+				if err != nil {
+					panic(err)
+				}
+				if f.c.SaveCodeToMap == nil {
+					f.c.SaveCodeToMap = make(map[string]map[int]bool)
+				}
+
+				saveMap := f.c.SaveCodeToMap[mapName]
+				if saveMap == nil {
+					saveMap = make(map[int]bool)
+				}
+				saveMap[int(v.value)] = true
+				f.c.SaveCodeToMap[mapName] = saveMap
+			}
+
 			f.values = append(f.values, v)
 		}
 	}
 	return false
-}
-
-// Helpers
-
-// usize returns the number of bits of the smallest unsigned integer
-// type that will hold n. Used to create the smallest possible slice of
-// integers to use as indexes into the concatenated strings.
-func usize(n int) int {
-	switch {
-	case n < 1<<8:
-		return 8
-	case n < 1<<16:
-		return 16
-	default:
-		// 2^32 is enough constants for anyone.
-		return 32
-	}
-}
-
-// declareIndexAndNameVars declares the index slices and concatenated names
-// strings representing the runs of values.
-func (g *Generator) declareIndexAndNameVars(runs [][]Value, typeName string) {
-	var indexes, names []string
-	for i, run := range runs {
-		index, name := g.createIndexAndNameDecl(run, typeName, fmt.Sprintf("_%d", i))
-		if len(run) != 1 {
-			indexes = append(indexes, index)
-		}
-		names = append(names, name)
-	}
-	g.Printf("const (\n")
-	for _, name := range names {
-		g.Printf("\t%s\n", name)
-	}
-	g.Printf(")\n\n")
-
-	if len(indexes) > 0 {
-		g.Printf("var (")
-		for _, index := range indexes {
-			g.Printf("\t%s\n", index)
-		}
-		g.Printf(")\n\n")
-	}
-}
-
-// declareIndexAndNameVar is the single-run version of declareIndexAndNameVars
-func (g *Generator) declareIndexAndNameVar(run []Value, typeName string) {
-	index, name := g.createIndexAndNameDecl(run, typeName, "")
-	g.Printf("const %s\n", name)
-	g.Printf("var %s\n", index)
-}
-
-// createIndexAndNameDecl returns the pair of declarations for the run. The caller will add "const" and "var".
-func (g *Generator) createIndexAndNameDecl(run []Value, typeName string, suffix string) (string, string) {
-	b := new(bytes.Buffer)
-	indexes := make([]int, len(run))
-	for i := range run {
-		b.WriteString(run[i].Name)
-		indexes[i] = b.Len()
-	}
-	nameConst := fmt.Sprintf("_%s_name%s = %q", typeName, suffix, b.String())
-	nameLen := b.Len()
-	b.Reset()
-	fmt.Fprintf(b, "_%s_index%s = [...]uint%d{0, ", typeName, suffix, usize(nameLen))
-	for i, v := range indexes {
-		if i > 0 {
-			fmt.Fprintf(b, ", ")
-		}
-		fmt.Fprintf(b, "%d", v)
-	}
-	fmt.Fprintf(b, "}")
-	return b.String(), nameConst
 }
 
 // declareNameVars declares the concatenated names string representing all the values in the runs.

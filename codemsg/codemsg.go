@@ -53,6 +53,9 @@ func genCodeMsg(c *CodeMsg) {
 
 	for _, typeName := range types {
 		g.generateCodeMsg(c, typeName)
+		for mapName, m := range c.SaveCodeToMap {
+			saveTakeFileMap(dir, g.pkg.name, typeName, mapName, m)
+		}
 	}
 
 	saveFile(c, dir, g.format(), "_codemsg.go", types[0])
@@ -62,14 +65,13 @@ func genCodeMsg(c *CodeMsg) {
 }
 
 func saveFile(c *CodeMsg, dir string, src []byte, suffix string, types string) {
-
 	outputName := c.Output
 	if outputName == "" {
 		baseName := fmt.Sprintf("%s%s", types, suffix)
 		outputName = filepath.Join(dir, strings.ToLower(baseName))
 	}
 
-	err := ioutil.WriteFile(outputName, src, 0644)
+	err := ioutil.WriteFile(outputName, src, 0o644)
 	if err != nil {
 		log.Fatalf("writing output: %s", err)
 	}
@@ -77,7 +79,6 @@ func saveFile(c *CodeMsg, dir string, src []byte, suffix string, types string) {
 
 // generate produces the String method for the named type.
 func (g *Generator) generateCodeMsg(c *CodeMsg, typeName string) {
-
 	values := make([]Value, 0, 100)
 
 	for _, file := range g.pkg.files {
@@ -85,6 +86,7 @@ func (g *Generator) generateCodeMsg(c *CodeMsg, typeName string) {
 		// Set the state for this run of the walker.
 		file.typeName = typeName
 		file.values = nil
+		file.c = c
 		if file.file != nil {
 			ast.Inspect(file.file, file.genDecl)
 			values = append(values, file.values...)
@@ -100,7 +102,7 @@ func (g *Generator) generateCodeMsg(c *CodeMsg, typeName string) {
 	tmpl.Args = strings.Join(os.Args[2:], " ")
 	tmpl.PkgName = g.pkg.name
 
-	//tmpl.Gen(os.Stdout)
+	// tmpl.Gen(os.Stdout)
 	if err := tmpl.Gen(&g.buf); err != nil {
 		io.Copy(os.Stdout, bytes.NewReader(g.buf.Bytes()))
 	}

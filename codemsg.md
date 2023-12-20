@@ -3,6 +3,13 @@
 只要实现code，自动生成String()类型和CodeMsg类型。可以在错误码代码节约时间  
 1.给每个ErrNo类型生成String()方法, 内容就是注释里面的。  
 2.给每个ErrNo类型生成CodeMsg{}结构
+
+### 一、生成code msg代码
+1.1 使用命令
+```go
+h2o codemsg --code-msg --linecomment --type ErrNo ./testdata/err.go
+```
+1.2 code msg定义例子
 ```go
 // 这段代码是我们要写的。
 package demo
@@ -84,4 +91,34 @@ var (
 // 如果要修改生成的String方法名， 可以通过--string-method String2  选项
 // 如果要生成grpc的错误就用下面的命令
 // h2o codemsg --code-msg --linecomment --type ErrNo ./testdata/err.go --grpc --string-method string2 --string
+```
+
+### 二、提取某些code到指定的map里面 
+主要是过滤一些code，比如对错误进行分级的使用场景, 有些错误非服务端引起。需要忽略这些错误
+2.1 命令
+```go
+h2o codemsg --code-msg --linecomment --type ErrNo --take-code-to-map ./testdata/err.go
+```
+
+2.2 code msg定义例子, 提取感兴趣的code到map里面
+```go
+// 这段代码是我们要写的。
+package demo
+
+type ErrNo int32 // 这里的类型可以自定义，--type后面类型
+
+const (
+	ENo ErrNo = 1003 // @TakeCodeToMap(InfoMap) 号码出错
+
+	ENotFound ErrNo = 1004 //@TakeCodeToMap(InfoMap) 找不到
+)
+
+```
+
+生成的代码
+```go
+package demo
+
+var InfoMap = map[int]bool{1003: true, 1004: true}
+ 
 ```
